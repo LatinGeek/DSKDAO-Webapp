@@ -75,38 +75,56 @@ export async function fetchOwnedNFTs(
           continue;
         }
 
-        // Get token URI for token ID 1 (since each address can only mint one)
-        try {
-          const tokenUri = await readContract(config, {
-            address: contractAddress,
-            abi: NFTABI,
-            functionName: 'tokenURI',
-            args: [BigInt(1)],
-            chainId: mainnet.id,
-          }) as string;
+        // Get total supply to know how many tokens to check
+        const totalSupply = await readContract(config, {
+          address: contractAddress,
+          abi: NFTABI,
+          functionName: 'totalSupply',
+          args: [],
+          chainId: mainnet.id,
+        }) as bigint;
 
-          console.log("Token URI:", tokenUri);
+        console.log("Total supply:", totalSupply.toString());
 
-          if (tokenUri) {
-            const metadata = await fetchNFTMetadata(tokenUri);
-            ownedNFTs.push({
-              tokenId: '1',
-              contractAddress,
-              metadata,
-            });
-          }
-        } catch (uriError) {
-          console.error('Error fetching URI:', uriError);
-          // Add with default metadata if URI fetch fails
-          ownedNFTs.push({
-            tokenId: '1',
-            contractAddress,
-            metadata: {
-              name: 'Membership Pass',
-              description: 'Metadata temporarily unavailable',
-              image: '/placeholder.png'
+        // Check each token ID to find which one belongs to the user
+        for (let i = 1; i <= Number(totalSupply); i++) {
+          try {
+            const currentOwner = await readContract(config, {
+              address: contractAddress,
+              abi: NFTABI,
+              functionName: 'ownerOf',
+              args: [BigInt(i)],
+              chainId: mainnet.id,
+            }) as Address;
+
+            // If we found the token owned by this address
+            if (currentOwner.toLowerCase() === address.toLowerCase()) {
+              // Get token URI
+              const tokenUri = await readContract(config, {
+                address: contractAddress,
+                abi: NFTABI,
+                functionName: 'tokenURI',
+                args: [BigInt(i)],
+                chainId: mainnet.id,
+              }) as string;
+
+              console.log("Found token ID:", i, "Token URI:", tokenUri);
+
+              if (tokenUri) {
+                const metadata = await fetchNFTMetadata(tokenUri);
+                ownedNFTs.push({
+                  tokenId: i.toString(),
+                  contractAddress,
+                  metadata,
+                });
+                // Since we know each address can only mint one, we can break after finding it
+                break;
+              }
             }
-          });
+          } catch (error) {
+            console.error(`Error checking token ID ${i}:`, error);
+            continue;
+          }
         }
       } catch (error) {
         console.error(`Error processing contract ${contractAddress}:`, error);
