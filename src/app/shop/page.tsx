@@ -2,6 +2,8 @@
 
 import { Box, Grid, Typography } from '@mui/material';
 import ItemCard from '@/components/shop/ItemCard';
+import ShopFilters from '@/components/shop/ShopFilters';
+import { useMemo, useState } from 'react';
 
 // Helper function to generate placeholder images
 const getPlaceholderImage = (name: string, color: string = '0075FF') => {
@@ -50,6 +52,37 @@ const items = [
 ];
 
 export default function ShopPage() {
+  const maxPrice = Math.max(...items.map(item => item.price));
+  const [filters, setFilters] = useState({
+    search: '',
+    priceRange: [0, maxPrice] as [number, number],
+    sortBy: 'default',
+  });
+
+  const filteredItems = useMemo(() => {
+    return items
+      .filter(item => {
+        const matchesSearch = item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+                            item.description.toLowerCase().includes(filters.search.toLowerCase());
+        const matchesPrice = item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
+        return matchesSearch && matchesPrice;
+      })
+      .sort((a, b) => {
+        switch (filters.sortBy) {
+          case 'price-asc':
+            return a.price - b.price;
+          case 'price-desc':
+            return b.price - a.price;
+          case 'stock-asc':
+            return a.stock - b.stock;
+          case 'stock-desc':
+            return b.stock - a.stock;
+          default:
+            return 0;
+        }
+      });
+  }, [filters]);
+
   return (
     <Box sx={{ py: 3 }}>
       <Box sx={{ mb: 4 }}>
@@ -61,13 +94,26 @@ export default function ShopPage() {
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
-        {items.map((item) => (
-          <Grid key={item.id} item xs={12} sm={6} md={4} lg={3}>
-            <ItemCard item={item} />
-          </Grid>
-        ))}
-      </Grid>
+      <ShopFilters
+        onFiltersChange={setFilters}
+        maxPrice={maxPrice}
+      />
+
+      {filteredItems.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <Typography variant="h6" color="text.secondary">
+            No items found matching your criteria
+          </Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {filteredItems.map((item) => (
+            <Grid key={item.id} item xs={12} sm={6} md={4} lg={3}>
+              <ItemCard item={item} />
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Box>
   );
 } 

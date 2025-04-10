@@ -1,112 +1,107 @@
 'use client';
 
-import { FC } from 'react';
 import {
-  Paper,
+  Box,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Slider,
   Typography,
-  SelectChangeEvent,
   InputAdornment,
+  Card,
+  CardContent,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
-import { Search, FilterList } from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
+import { useState } from 'react';
 
 interface ShopFiltersProps {
-  search: string;
-  type: string;
-  priceRange: [number, number];
+  onFiltersChange: (filters: {
+    search: string;
+    priceRange: [number, number];
+    sortBy: string;
+  }) => void;
   maxPrice: number;
-  onSearchChange: (value: string) => void;
-  onTypeChange: (value: string) => void;
-  onPriceRangeChange: (value: [number, number]) => void;
 }
 
-const ShopFilters: FC<ShopFiltersProps> = ({
-  search,
-  type,
-  priceRange,
-  maxPrice,
-  onSearchChange,
-  onTypeChange,
-  onPriceRangeChange,
-}) => {
+export default function ShopFilters({ onFiltersChange, maxPrice }: ShopFiltersProps) {
+  const [search, setSearch] = useState('');
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
+  const [sortBy, setSortBy] = useState('default');
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newSearch = event.target.value;
+    setSearch(newSearch);
+    onFiltersChange({ search: newSearch, priceRange, sortBy });
+  };
+
+  const handlePriceRangeChange = (_event: Event, newValue: number | number[]) => {
+    const newRange = newValue as [number, number];
+    setPriceRange(newRange);
+    onFiltersChange({ search, priceRange: newRange, sortBy });
+  };
+
+  const handleSortChange = (event: any) => {
+    const newSort = event.target.value;
+    setSortBy(newSort);
+    onFiltersChange({ search, priceRange, sortBy: newSort });
+  };
+
   return (
-    <Paper className="card-background p-4">
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Search Filter */}
-        <div className="md:col-span-5">
+    <Card sx={{ mb: 3 }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
           <TextField
             fullWidth
             placeholder="Search items..."
-            variant="outlined"
             value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="input-primary"
+            onChange={handleSearchChange}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search className="text-gray-300" />
+                  <SearchIcon />
                 </InputAdornment>
               ),
-              className: 'bg-background-light rounded-lg text-white',
             }}
           />
-        </div>
 
-        {/* Type Filter */}
-        <div className="md:col-span-3">
-          <FormControl fullWidth variant="outlined" className="input-primary">
-            <InputLabel className="text-gray-300">
-              <div className="flex items-center gap-2">
-                <FilterList />
-                Item Type
-              </div>
-            </InputLabel>
-            <Select
-              value={type}
-              label="Item Type"
-              onChange={(e: SelectChangeEvent) => onTypeChange(e.target.value)}
-              className="bg-background-light rounded-lg text-white"
-            >
-              <MenuItem value="all">All Items</MenuItem>
-              <MenuItem value="digital">Digital</MenuItem>
-              <MenuItem value="physical">Physical</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
+          <Box sx={{ minWidth: 200 }}>
+            <FormControl fullWidth>
+              <InputLabel>Sort By</InputLabel>
+              <Select value={sortBy} label="Sort By" onChange={handleSortChange}>
+                <MenuItem value="default">Default</MenuItem>
+                <MenuItem value="price-asc">Price: Low to High</MenuItem>
+                <MenuItem value="price-desc">Price: High to Low</MenuItem>
+                <MenuItem value="stock-asc">Stock: Low to High</MenuItem>
+                <MenuItem value="stock-desc">Stock: High to Low</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
 
-        {/* Price Range Filter */}
-        <div className="md:col-span-4">
-          <Paper className="card-gradient p-4">
-            <Typography className="text-gray-300 flex items-center gap-2 mb-4">
-              <FilterList fontSize="small" />
-              Price Range
+          <Box sx={{ minWidth: 200 }}>
+            <Typography gutterBottom color="text.secondary">
+              Price Range (Points)
             </Typography>
             <Slider
               value={priceRange}
-              onChange={(_, value) => onPriceRangeChange(value as [number, number])}
+              onChange={handlePriceRangeChange}
               valueLabelDisplay="auto"
+              min={0}
               max={maxPrice}
-              className="text-primary-main"
-              valueLabelFormat={(value) => `${value} tickets`}
+              sx={{ mt: 1 }}
             />
-            <div className="flex justify-between mt-2">
-              <Typography variant="body2" className="text-gray-300">
-                {priceRange[0]} tickets
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+              <Typography variant="body2" color="text.secondary">
+                {priceRange[0]} Points
               </Typography>
-              <Typography variant="body2" className="text-gray-300">
-                {priceRange[1]} tickets
+              <Typography variant="body2" color="text.secondary">
+                {priceRange[1]} Points
               </Typography>
-            </div>
-          </Paper>
-        </div>
-      </div>
-    </Paper>
+            </Box>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
   );
-};
-
-export default ShopFilters; 
+} 
