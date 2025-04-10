@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { formatPrice } from '../utils/format';
 import {
   Card,
   CardContent,
@@ -11,6 +10,7 @@ import {
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Item } from '@/types/item';
+import TicketPrice from '@/components/common/TicketPrice';
 
 interface ItemCardProps {
   item: Item;
@@ -38,7 +38,7 @@ const ItemCard: FC<ItemCardProps> = ({ item, onAddToCart, disabled }) => {
         height="200"
         image={image}
         alt={name}
-        sx={{ objectFit: 'contain', p: 2, bgcolor: 'background.paper' }}
+        sx={{ objectFit: 'contain', p: 2, bgcolor: 'background.default' }}
       />
       <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Typography gutterBottom variant="h6" component="h2" noWrap>
@@ -66,9 +66,7 @@ const ItemCard: FC<ItemCardProps> = ({ item, onAddToCart, disabled }) => {
             alignItems: 'center',
           }}
         >
-          <Typography variant="h6" color="primary">
-            {formatPrice(price)}
-          </Typography>
+          <TicketPrice amount={price} />
           <Button
             variant="contained"
             startIcon={<ShoppingCartIcon />}

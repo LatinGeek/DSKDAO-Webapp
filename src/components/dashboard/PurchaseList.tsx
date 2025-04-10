@@ -13,9 +13,9 @@ import {
   Divider
 } from '@mui/material';
 import { usePurchases } from '@/hooks/usePurchases';
-import { formatPrice } from '@/utils/format';
 import { generatePlaceholderImage } from '@/utils/images';
 import { format } from 'date-fns';
+import TicketPrice from '@/components/common/TicketPrice';
 
 interface PurchaseListProps {
   userId: string;
@@ -96,10 +96,8 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                         {format(new Date(purchase.createdAt), 'PPpp')}
                       </Typography>
                     </Box>
-                    <Box display="flex" flexDirection="column" alignItems="flex-end">
-                      <Typography variant="h6" color="primary" gutterBottom>
-                        {formatPrice(purchase.totalPrice)}
-                      </Typography>
+                    <Box display="flex" flexDirection="column" alignItems="flex-end" gap={1}>
+                      <TicketPrice amount={purchase.totalPrice} size="large" />
                       <Chip
                         label={purchase.status}
                         color={getStatusColor(purchase.status) as any}
@@ -135,9 +133,10 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Box display="flex" flexDirection="column" alignItems="flex-end">
-                        <Typography variant="body2" color="text.secondary">
-                          Price per item: {formatPrice(purchase.totalPrice / purchase.quantity)}
+                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                          Price per item:
                         </Typography>
+                        <TicketPrice amount={purchase.totalPrice / purchase.quantity} size="small" />
                       </Box>
                     </Grid>
                   </Grid>
