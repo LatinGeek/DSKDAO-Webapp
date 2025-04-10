@@ -1,9 +1,11 @@
 'use client';
 
-import { Box, Grid, Typography } from '@mui/material';
-import ItemCard from '@/components/shop/ItemCard';
-import ShopFilters from '@/components/shop/ShopFilters';
-import { useMemo, useState } from 'react';
+import { Box, Container, Grid, Typography, Alert, CircularProgress } from '@mui/material';
+import { useItems } from '@/hooks/useItems';
+import ItemCard from '@/components/ItemCard';
+import { purchaseItem } from '@/services/purchaseService';
+import { useState } from 'react';
+import { Item } from '@/types/item';
 
 // Helper function to generate placeholder images
 const getPlaceholderImage = (name: string, color: string = '0075FF') => {
@@ -52,68 +54,73 @@ const items = [
 ];
 
 export default function ShopPage() {
-  const maxPrice = Math.max(...items.map(item => item.price));
-  const [filters, setFilters] = useState({
-    search: '',
-    priceRange: [0, maxPrice] as [number, number],
-    sortBy: 'default',
-  });
+  const { items, loading, error } = useItems();
+  const [purchaseStatus, setPurchaseStatus] = useState<{
+    type: 'success' | 'error';
+    message: string;
+  } | null>(null);
 
-  const filteredItems = useMemo(() => {
-    return items
-      .filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                            item.description.toLowerCase().includes(filters.search.toLowerCase());
-        const matchesPrice = item.price >= filters.priceRange[0] && item.price <= filters.priceRange[1];
-        return matchesSearch && matchesPrice;
-      })
-      .sort((a, b) => {
-        switch (filters.sortBy) {
-          case 'price-asc':
-            return a.price - b.price;
-          case 'price-desc':
-            return b.price - a.price;
-          case 'stock-asc':
-            return a.stock - b.stock;
-          case 'stock-desc':
-            return b.stock - a.stock;
-          default:
-            return 0;
-        }
+  const handlePurchase = async (item: Item) => {
+    try {
+      // TODO: Replace with actual user ID from auth
+      const userId = 'test-user';
+      
+      await purchaseItem({
+        itemId: item.id,
+        quantity: 1,
+        userId
       });
-  }, [filters]);
+
+      setPurchaseStatus({
+        type: 'success',
+        message: `Successfully purchased ${item.name}!`
+      });
+    } catch (error) {
+      setPurchaseStatus({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to purchase item'
+      });
+    }
+  };
 
   return (
-    <Box sx={{ py: 3 }}>
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" sx={{ mb: 1 }}>
-          Item Shop
-        </Typography>
-        <Typography variant="body1" color="text.secondary">
-          Browse and purchase items using your points
-        </Typography>
-      </Box>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        DSKDAO Item Shop
+      </Typography>
 
-      <ShopFilters
-        onFiltersChange={setFilters}
-        maxPrice={maxPrice}
-      />
+      {purchaseStatus && (
+        <Alert 
+          severity={purchaseStatus.type}
+          onClose={() => setPurchaseStatus(null)}
+          sx={{ mb: 2 }}
+        >
+          {purchaseStatus.message}
+        </Alert>
+      )}
 
-      {filteredItems.length === 0 ? (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h6" color="text.secondary">
-            No items found matching your criteria
-          </Typography>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" p={4}>
+          <CircularProgress />
         </Box>
       ) : (
         <Grid container spacing={3}>
-          {filteredItems.map((item) => (
-            <Grid key={item.id} item xs={12} sm={6} md={4} lg={3}>
-              <ItemCard item={item} />
+          {items.map((item) => (
+            <Grid item key={item.id} xs={12} sm={6} md={4}>
+              <ItemCard
+                item={item}
+                onPurchase={() => handlePurchase(item)}
+              />
             </Grid>
           ))}
         </Grid>
       )}
-    </Box>
+    </Container>
   );
 } 
