@@ -8,6 +8,7 @@ import BalanceCard from '@/components/dashboard/BalanceCard';
 import StatBaseCard from '@/components/dashboard/StatBaseCard';
 import UserRoles from '@/components/dashboard/UserRoles';
 import SoulPoints from '@/components/common/SoulPoints';
+import NFTGallery from '@/components/dashboard/NFTGallery';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -31,7 +32,7 @@ export default function DashboardPage() {
         <Grid item xs={12} sm={6} md={3}>
           <StatBaseCard
             title="Soul-Bound Points"
-            icon={<Stars sx={{ color: '#fff' }} />}
+            icon={<Stars sx={{ color: 'primary.main' }} />}
             change="+12%"
           >
             <SoulPoints amount={1250} size="large" />
@@ -50,6 +51,13 @@ export default function DashboardPage() {
           </StatBaseCard>
         </Grid>
       </Grid>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h4" sx={{ mb: 3 }}>
+          Your NFT Collection
+        </Typography>
+        <NFTGallery />
+      </Box>
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" sx={{ mb: 3 }}>
