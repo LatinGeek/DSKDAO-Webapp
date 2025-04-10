@@ -10,24 +10,28 @@ interface UserData {
   discordLinked: boolean;
   discordUserId: string;
   address: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface UserContextType {
   userData: UserData | null;
   loading: boolean;
   error: Error | null;
-  refreshUserData: () => void;
+  refreshUserData: () => Promise<void>;
+  updateUserData: (data: Partial<UserData>) => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType>({
   userData: null,
   loading: true,
   error: null,
-  refreshUserData: () => {},
+  refreshUserData: async () => {},
+  updateUserData: async () => {}
 });
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -45,26 +49,29 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       if (!querySnapshot.empty) {
         // Use existing document
         docId = querySnapshot.docs[0].id;
-        const data = querySnapshot.docs[0].data();
+        const data = querySnapshot.docs[0].data() as UserData;
         
         // Update if needed
         if (!data.discordLinked) {
           await setDoc(doc(db, 'users', docId), {
             ...data,
             discordLinked: true,
+            updatedAt: new Date().toISOString()
           }, { merge: true });
         }
       } else {
-        //TODO Handle new users
         // Create new document with generated ID
         const newDocRef = doc(collection(db, 'users'));
         docId = newDocRef.id;
         
+        const timestamp = new Date().toISOString();
         await setDoc(newDocRef, {
           balance: 0,
           discordLinked: true,
           discordUserId: discordId,
           address: '',
+          createdAt: timestamp,
+          updatedAt: timestamp
         });
       }
 
@@ -75,8 +82,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateUserData = async (data: Partial<UserData>) => {
+    if (!userDocId) return;
+
+    try {
+      await setDoc(doc(db, 'users', userDocId), {
+        ...data,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+    } catch (error) {
+      console.error('Error updating user data:', error);
+      throw error;
+    }
+  };
+
   const fetchUserData = async () => {
+    if (status === 'loading') {
+      return () => {};
+    }
+
     if (!session?.user?.id) {
+      setUserData(null);
       setLoading(false);
       return () => {};
     }
@@ -98,7 +124,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         },
         (error) => {
           console.error('Error fetching user data:', error);
-          setError(error);
+          setError(error instanceof Error ? error : new Error('Failed to fetch user data'));
           setLoading(false);
         }
       );
@@ -106,7 +132,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       return unsubscribe;
     } catch (error) {
       console.error('Error in fetchUserData:', error);
-      setError(error as Error);
+      setError(error instanceof Error ? error : new Error('Failed to fetch user data'));
       setLoading(false);
       return () => {};
     }
@@ -119,7 +145,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     };
 
     setupListener();
-  }, [session?.user?.id]);
+  }, [session?.user?.id, status]);
 
   const refreshUserData = async () => {
     setLoading(true);
@@ -127,7 +153,13 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <UserContext.Provider value={{ userData, loading, error, refreshUserData }}>
+    <UserContext.Provider value={{ 
+      userData, 
+      loading, 
+      error, 
+      refreshUserData,
+      updateUserData 
+    }}>
       {children}
     </UserContext.Provider>
   );
