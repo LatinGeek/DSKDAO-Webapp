@@ -1,12 +1,13 @@
 'use client';
 
 import { Box, Card, CardContent, Grid, Typography, Container } from '@mui/material';
-import { ShoppingCart, Battery50 } from '@mui/icons-material';
+import { Battery50, Stars } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import PurchaseList from '@/components/dashboard/PurchaseList';
 import BalanceCard from '@/components/dashboard/BalanceCard';
 import StatBaseCard from '@/components/dashboard/StatBaseCard';
 import UserRoles from '@/components/dashboard/UserRoles';
+import SoulPoints from '@/components/common/SoulPoints';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -29,13 +30,11 @@ export default function DashboardPage() {
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatBaseCard
-            title="Total Sales"
-            icon={<ShoppingCart sx={{ color: '#fff' }} />}
-            change="+8%"
+            title="Soul-Bound Points"
+            icon={<Stars sx={{ color: '#fff' }} />}
+            change="+12%"
           >
-            <Typography variant="h4" sx={{ mb: 2 }}>
-              173,000
-            </Typography>
+            <SoulPoints amount={1250} size="large" />
           </StatBaseCard>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
