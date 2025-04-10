@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import { MUIThemeProvider } from '@/components/providers/mui-theme-provider'
-import MainLayout from '@/components/layout/MainLayout'
+import RootProvider from '@/components/providers/RootProvider'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -19,9 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.variable} font-sans antialiased`}>
-        <MUIThemeProvider>
-          <MainLayout>{children}</MainLayout>
-        </MUIThemeProvider>
+        <RootProvider>{children}</RootProvider>
       </body>
     </html>
   )

@@ -1,53 +1,121 @@
 'use client';
 
-import { FC } from 'react';
-import { Card, CardContent, Typography } from '@mui/material';
-import { People, ShoppingCart, Casino, EmojiEvents } from '@mui/icons-material';
+import { Box, Card, CardContent, Grid, Typography, LinearProgress } from '@mui/material';
+import { AttachMoney, Person, ShoppingCart, Battery50 } from '@mui/icons-material';
+import TaskList from '@/components/dashboard/TaskList';
 
-const stats = [
-  { title: 'Active Users', value: '5,227', change: '+55%', icon: People },
-  { title: 'Items Sold', value: '3,461', change: '+90%', icon: ShoppingCart },
-  { title: 'Games Played', value: '12,234', change: '+42%', icon: Casino },
-  { title: 'Raffles Won', value: '891', change: '+23%', icon: EmojiEvents },
-];
+interface StatCardProps {
+  title: string;
+  value: string;
+  change: string;
+  icon: React.ReactNode;
+  positive?: boolean;
+}
 
-const HomePage: FC = () => {
+const StatCard = ({ title, value, change, icon, positive = true }: StatCardProps) => (
+  <Card>
+    <CardContent>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            sx={{
+              p: 1,
+              borderRadius: 1,
+              bgcolor: 'primary.main',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {icon}
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            {title}
+          </Typography>
+        </Box>
+        <Typography
+          variant="body2"
+          sx={{
+            color: positive ? 'success.main' : 'error.main',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          {change}
+        </Typography>
+      </Box>
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        {value}
+      </Typography>
+      <LinearProgress
+        variant="determinate"
+        value={70}
+        sx={{
+          height: 6,
+          borderRadius: 3,
+          bgcolor: 'background.default',
+          '& .MuiLinearProgress-bar': {
+            borderRadius: 3,
+          },
+        }}
+      />
+    </CardContent>
+  </Card>
+);
+
+export default function DashboardPage() {
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-gray-400 mt-2">Welcome back to DSKDAO Item Shop</p>
-      </div>
+    <Box sx={{ py: 3 }}>
+      <Typography variant="h4" sx={{ mb: 4 }}>
+        General Statistics
+      </Typography>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map(({ title, value, change, icon: Icon }) => (
-          <Card key={title} className="bg-background-paper">
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <Typography variant="h6" component="div" className="font-medium">
-                    {value}
-                  </Typography>
-                  <Typography color="textSecondary" gutterBottom>
-                    {title}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    className={change.startsWith('+') ? 'text-green-500' : 'text-red-500'}
-                  >
-                    {change}
-                  </Typography>
-                </div>
-                <div className="p-3 bg-background rounded-lg">
-                  <Icon className="text-secondary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
+      <Grid container spacing={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Today's Money"
+            value="$53,000"
+            change="+55%"
+            icon={<AttachMoney />}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Today's Users"
+            value="2,300"
+            change="+5%"
+            icon={<Person />}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Total Sales"
+            value="$173,000"
+            change="+8%"
+            icon={<ShoppingCart />}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <StatCard
+            title="Battery Health"
+            value="76%"
+            change="-11%"
+            icon={<Battery50 />}
+            positive={false}
+          />
+        </Grid>
+      </Grid>
+
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h4" sx={{ mb: 3 }}>
+          Tasks
+        </Typography>
+        <Card>
+          <CardContent>
+            <TaskList />
+          </CardContent>
+        </Card>
+      </Box>
+    </Box>
   );
-};
-
-export default HomePage; 
+} 

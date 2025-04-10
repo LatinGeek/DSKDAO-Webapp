@@ -1,94 +1,135 @@
 'use client';
 
-import { FC } from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, Chip } from '@mui/material';
-import { LocalOffer, Inventory, ShoppingCart } from '@mui/icons-material';
+import { useState } from 'react';
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Button,
+  Box,
+  Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress,
+} from '@mui/material';
+import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 
-interface ItemCardProps {
+interface Item {
   id: string;
   name: string;
   description: string;
   price: number;
   image: string;
-  type: 'digital' | 'physical';
+  currency: string;
   stock: number;
-  onPurchase: (id: string) => void;
 }
 
-const ItemCard: FC<ItemCardProps> = ({
-  id,
-  name,
-  description,
-  price,
-  image,
-  type,
-  stock,
-  onPurchase,
-}) => {
+interface ItemCardProps {
+  item: Item;
+}
+
+export default function ItemCard({ item }: ItemCardProps) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handlePurchase = async () => {
+    setLoading(true);
+    try {
+      // Implement purchase logic here
+      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated API call
+      setOpen(false);
+    } catch (error) {
+      console.error('Purchase failed:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Card className="card-background hover:shadow-xl transition-all duration-300">
-      <div className="relative">
+    <>
+      <Card
+        sx={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            transition: 'transform 0.2s ease-in-out',
+          },
+        }}
+      >
         <CardMedia
           component="img"
           height="200"
-          image={image}
-          alt={name}
-          className="h-48 object-cover"
+          image={item.image}
+          alt={item.name}
+          sx={{ objectFit: 'cover' }}
         />
-        <Chip
-          label={type}
-          color={type === 'digital' ? 'primary' : 'secondary'}
-          size="small"
-          className="absolute top-3 right-3 capitalize bg-background-paper/80 backdrop-blur-sm"
-        />
-      </div>
-      <CardContent className="space-y-4">
-        <div>
-          <Typography variant="h6" className="font-semibold mb-1 text-white">
-            {name}
-          </Typography>
-          <Typography
-            variant="body2"
-            className="text-gray-300 line-clamp-2"
-            style={{ minHeight: '40px' }}
-          >
-            {description}
-          </Typography>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-background-light">
-              <LocalOffer className="text-primary-main" />
-            </div>
-            <div>
-              <Typography variant="h6" className="font-bold text-white">
-                {price}
-              </Typography>
-              <Typography variant="caption" className="text-gray-300">
-                tickets
-              </Typography>
-            </div>
-          </div>
-          <div className="flex items-center gap-1 text-gray-300">
-            <Inventory fontSize="small" />
-            <Typography variant="body2">{stock} left</Typography>
-          </div>
-        </div>
-
-        <Button
-          variant="contained"
-          fullWidth
-          className="button-primary"
-          onClick={() => onPurchase(id)}
-          disabled={stock === 0}
-          startIcon={<ShoppingCart />}
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            bgcolor: 'background.paper',
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
+          }}
         >
-          {stock === 0 ? 'Out of Stock' : 'Purchase Now'}
-        </Button>
-      </CardContent>
-    </Card>
-  );
-};
+          <Typography variant="body2" fontWeight="medium">
+            {item.stock} left
+          </Typography>
+        </Box>
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          <Typography gutterBottom variant="h6" component="div">
+            {item.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {item.description}
+          </Typography>
+          <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Chip
+              label={`${item.price} ${item.currency}`}
+              color="primary"
+              sx={{ fontWeight: 'medium' }}
+            />
+            <Button
+              variant="contained"
+              startIcon={<ShoppingCartIcon />}
+              onClick={() => setOpen(true)}
+              disabled={item.stock === 0}
+            >
+              Purchase
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
 
-export default ItemCard; 
+      <Dialog open={open} onClose={() => !loading && setOpen(false)}>
+        <DialogTitle>Confirm Purchase</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1">
+            Are you sure you want to purchase {item.name} for {item.price} {item.currency}?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handlePurchase}
+            variant="contained"
+            disabled={loading}
+            startIcon={loading ? <CircularProgress size={20} /> : <ShoppingCartIcon />}
+          >
+            {loading ? 'Processing...' : 'Confirm Purchase'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
+} 
