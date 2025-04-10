@@ -8,7 +8,7 @@ const handler = NextAuth({
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
       authorization: {
         params: {
-          scope: 'identify email guilds',
+          scope: 'identify email guilds.members.read',
         },
       },
     }),
@@ -23,6 +23,7 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       session.accessToken = token.accessToken;
+      session.user.discordAccessToken = token.accessToken;
       session.user.id = token.discordId;
       return session;
     },

@@ -43,7 +43,7 @@ export const useAuth = () => {
         balance: userData.balance,
         image: session.user.image ?? null,
         roles: [],
-        discordAccessToken: session.user.discordAccessToken ?? null
+        discordAccessToken: (session.accessToken ?? session.user.discordAccessToken) ?? null
       });
     }
 

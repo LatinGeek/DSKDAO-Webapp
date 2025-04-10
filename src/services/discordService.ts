@@ -1,14 +1,37 @@
 const DISCORD_API_URL = 'https://discord.com/api/v10';
 const DSKDAO_SERVER_ID = '987406227875196928';
+const BOT_TOKEN = process.env.NEXT_PUBLIC_DISCORD_BOT_TOKEN;
 
-interface DiscordGuildMember {
-  roles: string[];
-  nick: string | null;
-  avatar: string | null;
-  joined_at: string;
+interface DiscordRole {
+  id: string;
+  name: string;
+  color: number;
+  position: number;
 }
 
-export async function getUserGuildRoles(accessToken: string): Promise<string[]> {
+interface GuildMember {
+  roles: string[];
+  nick: string | null;
+}
+
+export async function getGuildRoles(): Promise<DiscordRole[]> {
+  try {
+    const response = await fetch('/api/discord/roles');
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch guild roles');
+    }
+
+    const roles: DiscordRole[] = await response.json();
+    return roles;
+  } catch (error) {
+    console.error('Error fetching guild roles:', error);
+    throw error;
+  }
+}
+
+export async function getUserGuildMember(accessToken: string): Promise<GuildMember> {
   try {
     const response = await fetch(
       `${DISCORD_API_URL}/users/@me/guilds/${DSKDAO_SERVER_ID}/member`,
@@ -20,39 +43,13 @@ export async function getUserGuildRoles(accessToken: string): Promise<string[]> 
     );
 
     if (!response.ok) {
-      throw new Error('Failed to fetch Discord roles');
+      throw new Error('Failed to fetch guild member');
     }
 
-    const data = await response.json();
-    return data.roles || [];
+    const member: GuildMember = await response.json();
+    return member;
   } catch (error) {
-    console.error('Error fetching Discord roles:', error);
-    throw error;
-  }
-}
-
-export async function getUserGuildMember(accessToken: string): Promise<DiscordGuildMember> {
-  if (!DSKDAO_SERVER_ID) {
-    throw new Error('Discord Guild ID is not configured');
-  }
-
-  try {
-    const response = await fetch(`${DISCORD_API_URL}/users/@me/guilds/${DSKDAO_SERVER_ID}/member`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Unauthorized: Invalid Discord token');
-      }
-      throw new Error(`Failed to fetch Discord member data: ${response.statusText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('Error fetching Discord member data:', error);
+    console.error('Error fetching guild member:', error);
     throw error;
   }
 } 

@@ -1,6 +1,10 @@
-import { Box, Card, CardContent, Typography, CircularProgress } from '@mui/material';
+import { Box, Card, CardContent, Typography, CircularProgress, Chip, Stack } from '@mui/material';
 import { useDiscordRole } from '@/hooks/useDiscordRole';
 import { useAuth } from '@/hooks/useAuth';
+
+function getRoleColor(color: number): string {
+  return color === 0 ? '#99AAB5' : `#${color.toString(16).padStart(6, '0')}`;
+}
 
 export default function UserRoles() {
   const { roles, loading, error } = useDiscordRole();
@@ -55,13 +59,19 @@ export default function UserRoles() {
           Discord Roles
         </Typography>
         {roles.length > 0 ? (
-          <Box>
+          <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
             {roles.map((role) => (
-              <Typography key={role} color="text.secondary">
-                {role}
-              </Typography>
+              <Chip
+                key={role.id}
+                label={role.name}
+                sx={{
+                  backgroundColor: getRoleColor(role.color),
+                  color: role.color === 0 ? 'text.primary' : '#FFFFFF',
+                  fontWeight: 500,
+                }}
+              />
             ))}
-          </Box>
+          </Stack>
         ) : (
           <Typography color="text.secondary">
             No roles found in DSKDAO server
