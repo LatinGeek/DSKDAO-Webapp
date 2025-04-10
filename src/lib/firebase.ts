@@ -1,5 +1,8 @@
-import { initializeApp } from 'firebase/app';
+'use client';
+
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth, connectAuthEmulator } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,5 +14,32 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app); 
+function initializeFirebase() {
+  try {
+    if (!getApps().length) {
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      // Connect to auth emulator in development
+      if (process.env.NODE_ENV === 'development') {
+        connectAuthEmulator(auth, 'http://localhost:9099');
+      }
+
+      return { app, auth, db };
+    }
+
+    const app = getApp();
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    return { app, auth, db };
+  } catch (error) {
+    console.error('Error initializing Firebase:', error);
+    throw error;
+  }
+}
+
+const { db, auth } = initializeFirebase();
+
+export { db, auth }; 

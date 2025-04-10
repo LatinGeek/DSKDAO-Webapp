@@ -4,8 +4,10 @@ import { Box, Container, Grid, Typography, Alert, CircularProgress } from '@mui/
 import { useItems } from '@/hooks/useItems';
 import ItemCard from '@/components/ItemCard';
 import { purchaseItem } from '@/services/purchaseService';
+import { updateUserBalance, InsufficientBalanceError, UserNotFoundError } from '@/services/userService';
 import { useState } from 'react';
 import { Item } from '@/types/item';
+import { useAuth } from '@/hooks/useAuth';
 
 // Helper function to generate placeholder images
 const getPlaceholderImage = (name: string, color: string = '0075FF') => {
@@ -55,20 +57,30 @@ const items = [
 
 export default function ShopPage() {
   const { items, loading, error } = useItems();
+  const { user } = useAuth();
   const [purchaseStatus, setPurchaseStatus] = useState<{
     type: 'success' | 'error';
     message: string;
   } | null>(null);
 
   const handlePurchase = async (item: Item) => {
+    if (!user?.discordId) {
+      setPurchaseStatus({
+        type: 'error',
+        message: 'Please connect your Discord account to make purchases'
+      });
+      return;
+    }
+
     try {
-      // TODO: Replace with actual user ID from auth
-      const userId = 'test-user';
-      
+      // Update user balance first using Discord ID
+      await updateUserBalance(user.discordId, item.price);
+
+      // If balance update succeeds, proceed with purchase
       await purchaseItem({
         itemId: item.id,
         quantity: 1,
-        userId
+        userId: user.discordId // Use Discord ID for purchase record
       });
 
       setPurchaseStatus({
@@ -76,11 +88,42 @@ export default function ShopPage() {
         message: `Successfully purchased ${item.name}!`
       });
     } catch (error) {
-      setPurchaseStatus({
-        type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to purchase item'
-      });
+      // Handle specific error types
+      if (error instanceof InsufficientBalanceError) {
+        setPurchaseStatus({
+          type: 'error',
+          message: 'Insufficient balance to complete this purchase'
+        });
+      } else if (error instanceof UserNotFoundError) {
+        setPurchaseStatus({
+          type: 'error',
+          message: 'Your Discord account is not registered in our system. Please link your account first.'
+        });
+      } else {
+        setPurchaseStatus({
+          type: 'error',
+          message: error instanceof Error ? error.message : 'Failed to purchase item'
+        });
+      }
     }
+  };
+
+  const getAuthAlert = () => {
+    if (!user) {
+      return (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Please login to make purchases
+        </Alert>
+      );
+    }
+    if (!user.discordId) {
+      return (
+        <Alert severity="warning" sx={{ mb: 2 }}>
+          Please connect your Discord account to make purchases
+        </Alert>
+      );
+    }
+    return null;
   };
 
   return (
@@ -88,6 +131,8 @@ export default function ShopPage() {
       <Typography variant="h4" component="h1" gutterBottom>
         DSKDAO Item Shop
       </Typography>
+
+      {getAuthAlert()}
 
       {purchaseStatus && (
         <Alert 
@@ -116,6 +161,7 @@ export default function ShopPage() {
               <ItemCard
                 item={item}
                 onPurchase={() => handlePurchase(item)}
+                disabled={!user?.discordId}
               />
             </Grid>
           ))}
