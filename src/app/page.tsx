@@ -1,68 +1,12 @@
 'use client';
 
-import { Box, Card, CardContent, Grid, Typography, LinearProgress, Container } from '@mui/material';
-import { AttachMoney, Person, ShoppingCart, Battery50 } from '@mui/icons-material';
+import { Box, Card, CardContent, Grid, Typography, Container } from '@mui/material';
+import { ShoppingCart, Battery50 } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import PurchaseList from '@/components/dashboard/PurchaseList';
-
-interface StatCardProps {
-  title: string;
-  value: string;
-  change: string;
-  icon: React.ReactNode;
-  positive?: boolean;
-}
-
-const StatCard = ({ title, value, change, icon, positive = true }: StatCardProps) => (
-  <Card>
-    <CardContent>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Box
-            sx={{
-              p: 1,
-              borderRadius: 1,
-              bgcolor: 'primary.main',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {icon}
-          </Box>
-          <Typography variant="body2" color="text.secondary">
-            {title}
-          </Typography>
-        </Box>
-        <Typography
-          variant="body2"
-          sx={{
-            color: positive ? 'success.main' : 'error.main',
-            display: 'flex',
-            alignItems: 'center',
-          }}
-        >
-          {change}
-        </Typography>
-      </Box>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        {value}
-      </Typography>
-      <LinearProgress
-        variant="determinate"
-        value={70}
-        sx={{
-          height: 6,
-          borderRadius: 3,
-          bgcolor: 'background.default',
-          '& .MuiLinearProgress-bar': {
-            borderRadius: 3,
-          },
-        }}
-      />
-    </CardContent>
-  </Card>
-);
+import BalanceCard from '@/components/dashboard/BalanceCard';
+import StatBaseCard from '@/components/dashboard/StatBaseCard';
+import UserRoles from '@/components/dashboard/UserRoles';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -75,37 +19,36 @@ export default function DashboardPage() {
 
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Today's Money"
-            value="$53,000"
+          <BalanceCard 
+            balance={user?.balance || 0}
             change="+55%"
-            icon={<AttachMoney />}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Today's Users"
-            value="2,300"
-            change="+5%"
-            icon={<Person />}
-          />
+          <UserRoles />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
+          <StatBaseCard
             title="Total Sales"
-            value="$173,000"
+            icon={<ShoppingCart sx={{ color: '#fff' }} />}
             change="+8%"
-            icon={<ShoppingCart />}
-          />
+          >
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              173,000
+            </Typography>
+          </StatBaseCard>
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
+          <StatBaseCard
             title="Battery Health"
-            value="76%"
+            icon={<Battery50 sx={{ color: '#fff' }} />}
             change="-11%"
-            icon={<Battery50 />}
-            positive={false}
-          />
+            progressValue={76}
+          >
+            <Typography variant="h4" sx={{ mb: 2 }}>
+              76%
+            </Typography>
+          </StatBaseCard>
         </Grid>
       </Grid>
 

@@ -14,6 +14,8 @@ interface AuthUser {
   discordUsername: string | null;
   balance: number;
   image: string | null;
+  roles: string[];  // Array of Discord role IDs
+  discordAccessToken: string | null;
 }
 
 export const useAuth = () => {
@@ -39,7 +41,9 @@ export const useAuth = () => {
         discordId: userData.discordUserId,
         discordUsername: session.user.name ?? null,
         balance: userData.balance,
-        image: session.user.image ?? null
+        image: session.user.image ?? null,
+        roles: [],
+        discordAccessToken: session.user.discordAccessToken ?? null
       });
     }
 
