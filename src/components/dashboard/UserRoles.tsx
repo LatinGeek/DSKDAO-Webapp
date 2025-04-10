@@ -1,9 +1,40 @@
-import { Box, Card, CardContent, Typography, CircularProgress, Chip, Stack } from '@mui/material';
+import { Box, Typography, CircularProgress, Tooltip, IconButton } from '@mui/material';
 import { useDiscordRole } from '@/hooks/useDiscordRole';
 import { useAuth } from '@/hooks/useAuth';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import CodeIcon from '@mui/icons-material/Code';
+import GroupsIcon from '@mui/icons-material/Groups';
+import PersonIcon from '@mui/icons-material/Person';
+import StarIcon from '@mui/icons-material/Star';
+import HelpIcon from '@mui/icons-material/Help';
+import TagIcon from '@mui/icons-material/Tag';
+import StatBaseCard from './StatBaseCard';
+
+function getRoleIcon(roleName: string) {
+  const name = roleName.toLowerCase();
+  if (name.includes('admin')) {
+    return <AdminPanelSettingsIcon sx={{ fontSize: '1.2rem' }} />
+  }
+  if (name.includes('developer') && name.includes('lead')) {
+    return <CodeIcon sx={{ fontSize: '1.2rem' }} />
+  }
+  if (name.includes('developer') || name.includes('dev')) {
+    return <GroupsIcon sx={{ fontSize: '1.2rem' }} />
+  }
+  if (name.includes('team') && name.includes('member')) {
+    return <PersonIcon sx={{ fontSize: '1.2rem' }} />
+  }
+  if (name.includes('og')) {
+    return <StarIcon sx={{ fontSize: '1.2rem' }} />
+  }
+  return <HelpIcon sx={{ fontSize: '1.2rem' }} />
+}
 
 function getRoleColor(color: number): string {
-  return color === 0 ? '#99AAB5' : `#${color.toString(16).padStart(6, '0')}`;
+  // Use a consistent blue for most roles, and special colors for specific ones
+  if (color === 0) return '#3498db'; // Default blue for most roles
+  if (color === parseInt('992D22', 16)) return '#992D22'; // Keep original red for OG
+  return '#3498db'; // Default to blue for consistency
 }
 
 export default function UserRoles() {
@@ -12,72 +43,100 @@ export default function UserRoles() {
 
   if (!user?.discordId) {
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Discord Roles
-          </Typography>
-          <Typography color="text.secondary">
-            Please connect your Discord account to view your roles
-          </Typography>
-        </CardContent>
-      </Card>
+      <StatBaseCard
+        title="Discord Roles"
+        icon={<TagIcon sx={{ color: '#fff' }} />}
+        progressValue={0}
+      >
+        <Typography sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+          Please connect your Discord account to view your roles
+        </Typography>
+      </StatBaseCard>
     );
   }
 
   if (loading) {
     return (
-      <Card>
-        <CardContent>
-          <Box display="flex" justifyContent="center" alignItems="center" minHeight={100}>
-            <CircularProgress />
-          </Box>
-        </CardContent>
-      </Card>
+      <StatBaseCard
+        title="Discord Roles"
+        icon={<TagIcon sx={{ color: '#fff' }} />}
+        progressValue={70}
+      >
+        <Box display="flex" justifyContent="center" py={1}>
+          <CircularProgress size={24} />
+        </Box>
+      </StatBaseCard>
     );
   }
 
   if (error) {
     return (
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Discord Roles
-          </Typography>
-          <Typography color="error">
-            {error}
-          </Typography>
-        </CardContent>
-      </Card>
+      <StatBaseCard
+        title="Discord Roles"
+        icon={<TagIcon sx={{ color: '#fff' }} />}
+        progressValue={0}
+      >
+        <Typography color="error" sx={{ fontSize: '0.875rem' }}>
+          {error}
+        </Typography>
+      </StatBaseCard>
     );
   }
 
+  const progressValue = (roles.length / 5) * 100; // Assuming 5 is the max number of roles
+
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h6" gutterBottom>
-          Discord Roles
-        </Typography>
-        {roles.length > 0 ? (
-          <Stack direction="row" spacing={1} flexWrap="wrap" gap={1}>
-            {roles.map((role) => (
-              <Chip
-                key={role.id}
-                label={role.name}
+    <StatBaseCard
+      title="Discord Roles"
+      icon={<TagIcon sx={{ color: '#fff' }} />}
+      progressValue={progressValue}
+      change={`${roles.length} roles`}
+    >
+      {roles.length > 0 ? (
+        <Box 
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, 36px)',
+            gap: '8px',
+            justifyContent: 'start'
+          }}
+        >
+          {roles.map((role) => (
+            <Tooltip 
+              key={role.id} 
+              title={role.name} 
+              arrow 
+              placement="top"
+              enterDelay={300}
+            >
+              <IconButton
+                size="small"
                 sx={{
                   backgroundColor: getRoleColor(role.color),
-                  color: role.color === 0 ? 'text.primary' : '#FFFFFF',
-                  fontWeight: 500,
+                  width: '36px',
+                  height: '36px',
+                  padding: 0,
+                  '&:hover': {
+                    backgroundColor: getRoleColor(role.color),
+                    opacity: 0.9,
+                    transform: 'translateY(-2px)',
+                  },
+                  transition: 'transform 0.2s ease-in-out',
+                  '& svg': {
+                    color: '#FFFFFF',
+                  }
                 }}
-              />
-            ))}
-          </Stack>
-        ) : (
-          <Typography color="text.secondary">
-            No roles found in DSKDAO server
-          </Typography>
-        )}
-      </CardContent>
-    </Card>
+              >
+                {getRoleIcon(role.name)}
+              </IconButton>
+            </Tooltip>
+          ))}
+        </Box>
+      ) : (
+        <Typography sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
+          No roles found in DSKDAO server
+        </Typography>
+      )}
+    </StatBaseCard>
   );
 } 
