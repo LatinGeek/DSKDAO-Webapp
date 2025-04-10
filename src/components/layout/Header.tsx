@@ -156,23 +156,11 @@ export default function Header() {
               onClick={(e) => e.stopPropagation()}
               slotProps={{
                 paper: {
-                  elevation: 2,
+                  elevation: 0,
                   sx: {
                     mt: 1,
                     minWidth: 280,
                     overflow: 'visible',
-                    '&:before': {
-                      content: '""',
-                      display: 'block',
-                      position: 'absolute',
-                      top: 0,
-                      right: 14,
-                      width: 10,
-                      height: 10,
-                      bgcolor: 'background.paper',
-                      transform: 'translateY(-50%) rotate(45deg)',
-                      zIndex: 0,
-                    },
                   },
                 },
               }}
@@ -180,8 +168,8 @@ export default function Header() {
               anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
               <Box sx={{ px: 2, py: 1.5 }}>
-                <Stack spacing={1}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Stack spacing={1.5}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Avatar
                       src={session.user?.image || undefined}
                       alt={session.user?.name || 'User'}
@@ -197,7 +185,7 @@ export default function Header() {
                     </Box>
                   </Box>
 
-                  <Divider />
+                  <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
 
                   <Stack spacing={0.5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>

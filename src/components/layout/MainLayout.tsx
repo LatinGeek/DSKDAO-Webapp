@@ -12,7 +12,9 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
       <Box sx={{ 
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        background: (theme) => theme.palette.customGradient,
+        overflow: 'hidden',
       }}>
         <Header />
         <Box sx={{ display: 'flex', flex: 1 }}>
@@ -21,10 +23,15 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             component="main" 
             sx={{ 
               flex: 1,
-              p: 3,
-              background: (theme) => theme.palette.customGradient,
+              p: { xs: 2, sm: 3, md: 4 },
               overflowX: 'hidden',
-              transition: 'margin 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
+              overflowY: 'auto',
+              transition: 'all 0.3s ease-in-out',
+              backdropFilter: 'blur(12px)',
+              backgroundColor: 'rgba(17, 28, 68, 0.35)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3,
             }}
           >
             <Box sx={{ minHeight: '64px' }} /> {/* Toolbar spacer */}

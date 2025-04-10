@@ -74,6 +74,20 @@ const theme = createTheme({
     borderRadius: 8,
   },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '*': {
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '4px',
+          },
+        },
+      },
+    },
     MuiButton: {
       styleOverrides: {
         root: {
@@ -85,9 +99,35 @@ const theme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundImage: 'none',
-          backgroundColor: '#111C44',
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(17, 28, 68, 0.7)',
           borderRadius: 16,
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(17, 28, 68, 0.7) !important',
+          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(17, 28, 68, 0.7) !important',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(17, 28, 68, 0.7)',
         },
       },
     },
@@ -100,6 +140,46 @@ const theme = createTheme({
             '&:hover': {
               backgroundColor: '#0052B2',
             },
+          },
+        },
+      },
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: {
+          backdropFilter: 'blur(12px)',
+          backgroundColor: 'rgba(17, 28, 68, 0.75)',
+          borderRadius: 16,
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+          '&:before': {
+            content: '""',
+            display: 'block',
+            position: 'absolute',
+            top: 0,
+            right: 14,
+            width: 10,
+            height: 10,
+            backdropFilter: 'blur(12px)',
+            backgroundColor: 'rgba(17, 28, 68, 0.75)',
+            transform: 'translateY(-50%) rotate(45deg)',
+            zIndex: 0,
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderBottom: 'none',
+            borderRight: 'none',
+          },
+        },
+      },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          margin: '4px 6px',
+          padding: '8px 12px',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
           },
         },
       },
