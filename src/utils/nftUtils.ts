@@ -1,5 +1,8 @@
-import { Address, erc721ABI } from 'wagmi';
-import { readContracts } from '@wagmi/core';
+import { type Address } from 'viem';
+import { readContract } from 'wagmi/actions';
+import { NFTABI } from '../../contracts/membership_pass';
+import { mainnet } from 'wagmi/chains';
+import { type Config } from 'wagmi';
 
 // Add your NFT contract addresses here
 export const NFT_CONTRACTS: Address[] = [
@@ -21,70 +24,93 @@ export interface NFTData {
 export async function fetchNFTMetadata(uri: string): Promise<NFTMetadata> {
   // Handle IPFS URLs
   const url = uri.replace('ipfs://', 'https://ipfs.io/ipfs/');
-  const response = await fetch(url);
-  const metadata = await response.json();
-  
-  // Ensure image URL is properly formatted
-  if (metadata.image && metadata.image.startsWith('ipfs://')) {
-    metadata.image = metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const metadata = await response.json();
+    
+    // Ensure image URL is properly formatted
+    if (metadata.image && metadata.image.startsWith('ipfs://')) {
+      metadata.image = metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    }
+    
+    return metadata;
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+    return {
+      name: 'Unknown NFT',
+      description: 'Metadata unavailable',
+      image: '/placeholder.png'
+    };
   }
-  
-  return metadata;
 }
 
-export async function fetchOwnedNFTs(address: Address): Promise<NFTData[]> {
+export async function fetchOwnedNFTs(
+  config: Config,
+  address: Address
+): Promise<NFTData[]> {
   try {
-    const balanceContracts = NFT_CONTRACTS.map(contractAddress => ({
-      address: contractAddress,
-      abi: erc721ABI,
-      functionName: 'balanceOf',
-      args: [address] as const,
-    }));
-
-    const balances = await readContracts({
-      contracts: balanceContracts,
-    });
-
     const ownedNFTs: NFTData[] = [];
 
-    for (let i = 0; i < NFT_CONTRACTS.length; i++) {
-      const balance = Number(balances[i].result || 0);
-      if (balance > 0) {
-        const tokenIndexContracts = Array.from({ length: balance }, (_, index) => ({
-          address: NFT_CONTRACTS[i],
-          abi: erc721ABI,
-          functionName: 'tokenOfOwnerByIndex',
-          args: [address, BigInt(index)] as const,
-        }));
+    for (const contractAddress of NFT_CONTRACTS) {
+      try {
+        console.log("Processing contract:", contractAddress);
+        console.log("Checking address:", address);
 
-        const tokenIds = await readContracts({
-          contracts: tokenIndexContracts,
-        });
+        // Check if the user has minted an NFT
+        const hasMinted = await readContract(config, {
+          address: contractAddress,
+          abi: NFTABI,
+          functionName: 'isNftMinted',
+          args: [address],
+          chainId: mainnet.id,
+        }) as boolean;
 
-        const tokenURIContracts = tokenIds.map(token => ({
-          address: NFT_CONTRACTS[i],
-          abi: erc721ABI,
-          functionName: 'tokenURI',
-          args: [token.result!] as const,
-        }));
+        console.log("Has minted:", hasMinted);
 
-        const tokenURIs = await readContracts({
-          contracts: tokenURIContracts,
-        });
+        if (!hasMinted) {
+          console.log("No NFT minted by this address");
+          continue;
+        }
 
-        for (let j = 0; j < tokenIds.length; j++) {
-          const tokenId = tokenIds[j].result?.toString();
-          const uri = tokenURIs[j].result?.toString();
-          
-          if (tokenId && uri) {
-            const metadata = await fetchNFTMetadata(uri);
+        // Get token URI for token ID 1 (since each address can only mint one)
+        try {
+          const tokenUri = await readContract(config, {
+            address: contractAddress,
+            abi: NFTABI,
+            functionName: 'tokenURI',
+            args: [BigInt(1)],
+            chainId: mainnet.id,
+          }) as string;
+
+          console.log("Token URI:", tokenUri);
+
+          if (tokenUri) {
+            const metadata = await fetchNFTMetadata(tokenUri);
             ownedNFTs.push({
-              tokenId,
-              contractAddress: NFT_CONTRACTS[i],
+              tokenId: '1',
+              contractAddress,
               metadata,
             });
           }
+        } catch (uriError) {
+          console.error('Error fetching URI:', uriError);
+          // Add with default metadata if URI fetch fails
+          ownedNFTs.push({
+            tokenId: '1',
+            contractAddress,
+            metadata: {
+              name: 'Membership Pass',
+              description: 'Metadata temporarily unavailable',
+              image: '/placeholder.png'
+            }
+          });
         }
+      } catch (error) {
+        console.error(`Error processing contract ${contractAddress}:`, error);
+        continue;
       }
     }
 

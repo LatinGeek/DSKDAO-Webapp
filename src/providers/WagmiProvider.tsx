@@ -1,48 +1,59 @@
 'use client';
 
-import { WagmiConfig, createConfig, configureChains } from 'wagmi';
+import { WagmiConfig } from 'wagmi';
 import { mainnet, sepolia } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import { createConfig } from 'wagmi';
+import { http } from 'viem';
 import {
-  getDefaultWallets,
   RainbowKitProvider,
   darkTheme,
+  getDefaultWallets,
+  connectorsForWallets,
 } from '@rainbow-me/rainbowkit';
 import '@rainbow-me/rainbowkit/styles.css';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { type ReactNode } from 'react';
 
-const { chains, publicClient } = configureChains(
-  [mainnet, sepolia],
-  [publicProvider()]
-);
+// Create a client
+const queryClient = new QueryClient();
 
-const { connectors } = getDefaultWallets({
-  appName: 'DSKDAO Item Shop',
-  projectId: 'fff8f9f218f93d91d162cc2de8343333', // You'll need to get this from WalletConnect
-  chains,
+const projectId = 'fff8f9f218f93d91d162cc2de8343333';
+const appName = 'DSKDAO Item Shop';
+
+// Create wagmi config outside of the component to prevent multiple initializations
+const { wallets } = getDefaultWallets();
+const connectors = connectorsForWallets(wallets, {
+  appName,
+  projectId,
 });
 
 const config = createConfig({
-  autoConnect: true,
+  chains: [mainnet, sepolia],
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
+  },
   connectors,
-  publicClient,
 });
 
 export default function WagmiProvider({
   children,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <WagmiConfig config={config}>
-      <RainbowKitProvider
-        chains={chains}
-        theme={darkTheme({
-          accentColor: '#0075FF',
-          borderRadius: 'medium',
-        })}
-      >
-        {children}
-      </RainbowKitProvider>
+      <QueryClientProvider client={queryClient}>
+        <RainbowKitProvider
+          theme={darkTheme({
+            accentColor: '#0075FF',
+            borderRadius: 'medium',
+          })}
+          modalSize="compact"
+        >
+          {children}
+        </RainbowKitProvider>
+      </QueryClientProvider>
     </WagmiConfig>
   );
 } 

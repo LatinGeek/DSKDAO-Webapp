@@ -23,13 +23,13 @@ import BaseCard from '../common/BaseCard';
 
 interface ItemCardProps {
   item: {
-    id: string;
-    name: string;
-    description: string;
-    price: number;
+  id: string;
+  name: string;
+  description: string;
+  price: number;
     currency: string;
-    image: string;
-    stock: number;
+  image: string;
+  stock: number;
   };
 }
 
@@ -74,29 +74,29 @@ export default function ItemCard({ item }: ItemCardProps) {
         sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       >
         <Box sx={{ position: 'relative' }}>
-          <CardMedia
-            component="img"
-            height="200"
-            image={item.image}
-            alt={item.name}
-            sx={{ objectFit: 'cover' }}
-          />
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 12,
-              right: 12,
-              bgcolor: 'background.paper',
-              borderRadius: 1,
-              px: 1,
-              py: 0.5,
+        <CardMedia
+          component="img"
+          height="200"
+          image={item.image}
+          alt={item.name}
+          sx={{ objectFit: 'cover' }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            bgcolor: 'background.paper',
+            borderRadius: 1,
+            px: 1,
+            py: 0.5,
               boxShadow: 1,
-            }}
-          >
-            <Typography variant="body2" fontWeight="medium">
-              {item.stock} left
-            </Typography>
-          </Box>
+          }}
+        >
+          <Typography variant="body2" fontWeight="medium">
+            {item.stock} left
+          </Typography>
+        </Box>
         </Box>
         <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
           <Typography gutterBottom variant="h6" sx={{ fontWeight: 600 }}>

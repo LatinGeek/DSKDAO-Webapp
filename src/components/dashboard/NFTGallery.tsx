@@ -2,21 +2,27 @@
 
 import { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Grid, Typography, Skeleton } from '@mui/material';
-import { useAccount } from 'wagmi';
+import { useAccount, useConfig } from 'wagmi';
 import { fetchOwnedNFTs, NFTData } from '@/utils/nftUtils';
 import Image from 'next/image';
 
 export default function NFTGallery() {
   const { address, isConnected } = useAccount();
+  const wagmiConfig = useConfig();
   const [nfts, setNfts] = useState<NFTData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function loadNFTs() {
       if (isConnected && address) {
         setLoading(true);
         try {
-          const ownedNFTs = await fetchOwnedNFTs(address);
+          const ownedNFTs = await fetchOwnedNFTs(wagmiConfig, address);
           setNfts(ownedNFTs);
         } catch (error) {
           console.error('Error loading NFTs:', error);
@@ -26,13 +32,47 @@ export default function NFTGallery() {
       }
     }
 
-    loadNFTs();
-  }, [address, isConnected]);
+    if (mounted) {
+      loadNFTs();
+    }
+  }, [address, isConnected, mounted, wagmiConfig]);
+
+  // Don't render anything until mounted to prevent hydration errors
+  if (!mounted) {
+    return (
+      <Card>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 3 }}>
+            Loading...
+          </Typography>
+          <Grid container spacing={3}>
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Grid item xs={12} sm={6} md={3} key={index}>
+                <Card sx={{ height: '100%' }}>
+                  <Skeleton
+                    variant="rectangular"
+                    sx={{ paddingTop: '100%', width: '100%' }}
+                  />
+                  <CardContent>
+                    <Skeleton width="60%" />
+                    <Skeleton width="40%" />
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!isConnected) {
     return (
       <Card>
         <CardContent>
+          <Typography variant="h6" sx={{ mb: 3 }}>
+            Your NFTs
+          </Typography>
           <Typography color="text.secondary">
             Please connect your wallet to view your NFTs.
           </Typography>
@@ -66,7 +106,7 @@ export default function NFTGallery() {
               </Grid>
             ))
           ) : nfts.length > 0 ? (
-            nfts.map((nft, index) => (
+            nfts.map((nft) => (
               <Grid item xs={12} sm={6} md={3} key={`${nft.contractAddress}-${nft.tokenId}`}>
                 <Card 
                   sx={{ 

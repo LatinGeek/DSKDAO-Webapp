@@ -25,9 +25,10 @@ const nextConfig = {
     return config;
   },
   transpilePackages: ['@firebase/auth'],
-  experimental: {
-    serverActions: true
-  }
+  reactStrictMode: false, // Disable StrictMode to prevent double initialization
+  images: {
+    domains: ['ipfs.io'], // Allow loading images from IPFS gateway
+  },
 };
 
 module.exports = nextConfig; 
