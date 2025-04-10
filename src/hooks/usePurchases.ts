@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs, orderBy, getDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Purchase, Item } from '@/types/item';
+import { generatePlaceholderImage } from '@/utils/images';
 
 interface PurchaseWithItem extends Purchase {
   item?: Item;
@@ -32,10 +33,21 @@ export const usePurchases = (userId: string | undefined) => {
           const purchaseData = purchaseDoc.data() as Purchase;
           const itemDoc = await getDoc(doc(db, 'items', purchaseData.itemId));
           
+          let itemData: Item | undefined;
+          
+          if (itemDoc.exists()) {
+            const data = itemDoc.data() as Item;
+            itemData = {
+              ...data,
+              id: itemDoc.id,
+              image: data.image?.trim() ? data.image : generatePlaceholderImage(data.name)
+            };
+          }
+
           return {
             ...purchaseData,
             id: purchaseDoc.id,
-            item: itemDoc.exists() ? { ...itemDoc.data(), id: itemDoc.id } as Item : undefined
+            item: itemData
           };
         });
 
