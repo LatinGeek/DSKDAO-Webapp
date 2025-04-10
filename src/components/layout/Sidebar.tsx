@@ -13,8 +13,8 @@ import {
 } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-
-const DRAWER_WIDTH = 280;
+import { useSidebar } from '../../contexts/SidebarContext';
+import { DRAWER_WIDTH } from './constants';
 
 const menuItems = [
   { 
@@ -37,22 +37,10 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { isSidebarOpen, toggleSidebar, isMobile } = useSidebar();
 
-  return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: DRAWER_WIDTH,
-        flexShrink: 0,
-        '& .MuiDrawer-paper': {
-          width: DRAWER_WIDTH,
-          boxSizing: 'border-box',
-          bgcolor: 'background.paper',
-          borderRight: '1px solid',
-          borderColor: 'divider',
-        },
-      }}
-    >
+  const drawerContent = (
+    <>
       <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
         <Box 
           sx={{ 
@@ -68,12 +56,12 @@ export default function Sidebar() {
           <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>V</Typography>
         </Box>
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
-          VISION UI PRO
+          DSKDAO
         </Typography>
       </Box>
 
       <Box sx={{ mt: 2 }}>
-        {menuItems.map((section, index) => (
+        {menuItems.map((section) => (
           <Box key={section.category} sx={{ mb: 3 }}>
             <Typography
               variant="caption"
@@ -95,6 +83,7 @@ export default function Sidebar() {
                     component={Link}
                     href={item.path}
                     selected={pathname === item.path}
+                    onClick={isMobile ? toggleSidebar : undefined}
                     sx={{
                       mx: 2,
                       borderRadius: 1,
@@ -128,6 +117,54 @@ export default function Sidebar() {
           </Box>
         ))}
       </Box>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <Drawer
+        variant="temporary"
+        open={isSidebarOpen}
+        onClose={toggleSidebar}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile.
+        }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            bgcolor: 'background.paper',
+            borderRight: '1px solid',
+            borderColor: 'divider',
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+    );
+  }
+
+  return (
+    <Drawer
+      variant="persistent"
+      open={isSidebarOpen}
+      sx={{
+        width: isSidebarOpen ? DRAWER_WIDTH : 0,
+        flexShrink: 0,
+        display: { xs: 'none', sm: 'block' },
+        '& .MuiDrawer-paper': {
+          width: DRAWER_WIDTH,
+          boxSizing: 'border-box',
+          bgcolor: 'background.paper',
+          borderRight: '1px solid',
+          borderColor: 'divider',
+          transform: isSidebarOpen ? 'none' : 'translateX(-100%)',
+          transition: 'transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+        },
+      }}
+    >
+      {drawerContent}
     </Drawer>
   );
 } 

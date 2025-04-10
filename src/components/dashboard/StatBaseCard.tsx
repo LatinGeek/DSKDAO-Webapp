@@ -16,41 +16,49 @@ export default function StatBaseCard({
   children 
 }: StatBaseCardProps) {
   return (
-    <Card>
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              sx={{
-                p: 1,
-                borderRadius: 1,
-                bgcolor: 'primary.main',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {icon}
+    <Card sx={{ height: '100%', minHeight: '180px', display: 'flex', flexDirection: 'column' }}>
+      <CardContent sx={{ 
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        p: 3
+      }}>
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  p: 1,
+                  borderRadius: 1,
+                  bgcolor: 'primary.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {icon}
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {title}
+              </Typography>
             </Box>
-            <Typography variant="body2" color="text.secondary">
-              {title}
-            </Typography>
+            {change && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: change.startsWith('+') ? 'success.main' : 'error.main',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                {change}
+              </Typography>
+            )}
           </Box>
-          {change && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: change.startsWith('+') ? 'success.main' : 'error.main',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              {change}
-            </Typography>
-          )}
-        </Box>
-        <Box sx={{ mb: 2 }}>
-          {children}
+          <Box sx={{ mb: 'auto' }}>
+            {children}
+          </Box>
         </Box>
         <LinearProgress
           variant="determinate"

@@ -28,11 +28,14 @@ import DiscordIcon from '@/components/icons/DiscordIcon';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import { useUser } from '@/contexts/UserContext';
 import { useState } from 'react';
+import { useSidebar } from '../../contexts/SidebarContext';
+import { DRAWER_WIDTH } from './constants';
 
 export default function Header() {
   const { data: session } = useSession();
   const { userData } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { toggleSidebar, isSidebarOpen } = useSidebar();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -48,21 +51,25 @@ export default function Header() {
   };
 
   return (
-    <AppBar 
-      position="sticky" 
-      sx={{ 
+    <AppBar
+      position="fixed"
+      sx={{
+        width: { sm: isSidebarOpen ? `calc(100% - ${DRAWER_WIDTH}px)` : '100%' },
+        ml: { sm: isSidebarOpen ? `${DRAWER_WIDTH}px` : 0 },
         bgcolor: 'background.paper',
         boxShadow: 'none',
         borderBottom: '1px solid',
-        borderColor: 'divider'
+        borderColor: 'divider',
+        transition: 'margin 225ms cubic-bezier(0, 0, 0.2, 1) 0ms, width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
       }}
     >
       <Toolbar sx={{ gap: 2 }}>
         <IconButton
-          size="medium"
-          edge="start"
           color="inherit"
-          aria-label="menu"
+          aria-label="toggle drawer"
+          edge="start"
+          onClick={toggleSidebar}
+          sx={{ mr: 2 }}
         >
           <MenuIcon />
         </IconButton>
@@ -76,7 +83,6 @@ export default function Header() {
               display: { xs: 'none', sm: 'block' }
             }}
           >
-            DSKDAO
           </Typography>
         </Box>
 
