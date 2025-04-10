@@ -13,6 +13,7 @@ interface AuthUser {
   discordId: string | null;
   discordUsername: string | null;
   balance: number;
+  image: string | null;
 }
 
 export const useAuth = () => {
@@ -37,7 +38,8 @@ export const useAuth = () => {
         displayName: session.user.name ?? null,
         discordId: userData.discordUserId,
         discordUsername: session.user.name ?? null,
-        balance: userData.balance
+        balance: userData.balance,
+        image: session.user.image ?? null
       });
     }
 

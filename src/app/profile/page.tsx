@@ -53,10 +53,15 @@ export default function ProfilePage() {
             <CardContent>
               <Box display="flex" alignItems="center" gap={3} mb={3}>
                 <Avatar
+                  src={user.image || undefined}
                   alt={user.displayName || 'User'}
-                  sx={{ width: 80, height: 80 }}
+                  sx={{ 
+                    width: 80, 
+                    height: 80,
+                    bgcolor: 'primary.main' // Fallback color when no image
+                  }}
                 >
-                  {user.displayName?.charAt(0) || 'U'}
+                  {!user.image && (user.displayName?.charAt(0) || 'U')}
                 </Avatar>
                 <Box>
                   <Typography variant="h5" gutterBottom>
