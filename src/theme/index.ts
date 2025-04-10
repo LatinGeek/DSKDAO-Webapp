@@ -3,9 +3,11 @@ import { createTheme } from '@mui/material/styles';
 declare module '@mui/material/styles' {
   interface Palette {
     darkBlue: Palette['primary'];
+    customGradient: string;
   }
   interface PaletteOptions {
     darkBlue?: PaletteOptions['primary'];
+    customGradient?: string;
   }
 }
 
@@ -31,6 +33,7 @@ const theme = createTheme({
       secondary: 'rgba(255, 255, 255, 0.7)',
     },
     divider: 'rgba(255, 255, 255, 0.12)',
+    customGradient: 'linear-gradient(135deg, #111C44 0%, rgb(8, 17, 53) 100%)',
   },
   typography: {
     fontFamily: '"Plus Jakarta Sans", "Roboto", "Helvetica", "Arial", sans-serif',

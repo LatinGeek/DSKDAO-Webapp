@@ -11,7 +11,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
     <SidebarProvider>
       <Box sx={{ 
         minHeight: '100vh',
-        bgcolor: 'background.default',
         display: 'flex',
         flexDirection: 'column'
       }}>
@@ -23,7 +22,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
             sx={{ 
               flex: 1,
               p: 3,
-              bgcolor: 'background.default',
+              background: (theme) => theme.palette.customGradient,
               overflowX: 'hidden',
               transition: 'margin 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
             }}
