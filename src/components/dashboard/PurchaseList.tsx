@@ -58,12 +58,18 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
   }
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2}>
       {purchases.map((purchase) => {
         const itemName = purchase.item?.name || `Item #${purchase.itemId.slice(-6)}`;
         
         return (
-          <Card key={purchase.id} variant="outlined" sx={{ overflow: 'visible' }}>
+          <Card 
+            key={purchase.id} 
+            sx={{ 
+              overflow: 'visible',
+              boxShadow: 'none'
+            }}
+          >
             <CardContent>
               <Grid container spacing={3}>
                 {/* Item Image */}
