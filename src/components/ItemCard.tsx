@@ -9,8 +9,8 @@ import {
   CardActions
 } from '@mui/material';
 import { Item } from '@/types/item';
-import { formatPrice } from '@/utils/format';
 import { generatePlaceholderImage } from '@/utils/images';
+import TicketPrice from '@/components/common/TicketPrice';
 
 interface ItemCardProps {
   item: Item;
@@ -63,9 +63,7 @@ export default function ItemCard({ item, onPurchase }: ItemCardProps) {
           {item.description}
         </Typography>
 
-        <Typography variant="h6" color="primary">
-          {formatPrice(item.price)}
-        </Typography>
+        <TicketPrice amount={item.price} size="large" />
       </CardContent>
 
       <CardActions>
