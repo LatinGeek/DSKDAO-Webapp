@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react';
 import { UserProvider } from '@/contexts/UserContext';
 import theme from '@/theme';
 import MainLayout from '@/components/layout/MainLayout';
+import WagmiProvider from '@/providers/WagmiProvider';
 
 export default function RootProvider({
   children,
@@ -12,13 +13,15 @@ export default function RootProvider({
   children: React.ReactNode;
 }) {
   return (
-    <SessionProvider>
-      <UserProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <MainLayout>{children}</MainLayout>
-        </ThemeProvider>
-      </UserProvider>
-    </SessionProvider>
+    <WagmiProvider>
+      <SessionProvider>
+        <UserProvider>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <MainLayout>{children}</MainLayout>
+          </ThemeProvider>
+        </UserProvider>
+      </SessionProvider>
+    </WagmiProvider>
   );
 } 

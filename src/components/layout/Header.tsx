@@ -23,6 +23,7 @@ import {
   NotificationsNone as NotificationsIcon,
   Login as LoginIcon,
   LocalActivity as TicketIcon,
+  AccountBalanceWallet as WalletIcon,
 } from '@mui/icons-material';
 import DiscordIcon from '@/components/icons/DiscordIcon';
 import { signIn, signOut, useSession } from 'next-auth/react';
@@ -30,6 +31,7 @@ import { useUser } from '@/contexts/UserContext';
 import { useState } from 'react';
 import { useSidebar } from '../../contexts/SidebarContext';
 import { DRAWER_WIDTH } from './constants';
+import ConnectWallet from '../wallet/ConnectWallet';
 
 export default function Header() {
   const { data: session } = useSession();
@@ -201,11 +203,24 @@ export default function Header() {
                       </Typography>
                     </Box>
                   </Stack>
+
+                  <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+                  
+                  <ConnectWallet onClose={handleMenuClose} />
+
+                  <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.08)' }} />
+
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    color="error"
+                    onClick={handleSignOut}
+                    size="small"
+                  >
+                    Sign Out
+                  </Button>
                 </Stack>
               </Box>
-              
-              <Divider />
-              <MenuItem onClick={handleSignOut} sx={{ py: 1.5 }}>Sign out</MenuItem>
             </Menu>
           </>
         ) : (

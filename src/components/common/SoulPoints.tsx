@@ -49,7 +49,7 @@ export default function SoulPoints({ amount, size = 'medium', sx }: SoulPointsPr
           lineHeight: 1
         }}
       >
-        {amount.toLocaleString()}
+        {amount}
       </Typography>
     </Box>
   );
