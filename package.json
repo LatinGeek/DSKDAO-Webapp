@@ -19,6 +19,7 @@
     "@types/react": "^18.2.52",
     "@types/react-dom": "^18.2.18",
     "autoprefixer": "^10.4.0",
+    "date-fns": "^4.1.0",
     "discord.js": "^14.14.1",
     "ethers": "^6.9.0",
     "firebase": "^10.8.0",

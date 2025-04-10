@@ -1,8 +1,9 @@
 'use client';
 
-import { Box, Card, CardContent, Grid, Typography, LinearProgress } from '@mui/material';
+import { Box, Card, CardContent, Grid, Typography, LinearProgress, Container } from '@mui/material';
 import { AttachMoney, Person, ShoppingCart, Battery50 } from '@mui/icons-material';
-import TaskList from '@/components/dashboard/TaskList';
+import { useAuth } from '@/hooks/useAuth';
+import PurchaseList from '@/components/dashboard/PurchaseList';
 
 interface StatCardProps {
   title: string;
@@ -64,9 +65,11 @@ const StatCard = ({ title, value, change, icon, positive = true }: StatCardProps
 );
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+
   return (
-    <Box sx={{ py: 3 }}>
-      <Typography variant="h4" sx={{ mb: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
         General Statistics
       </Typography>
 
@@ -108,14 +111,20 @@ export default function DashboardPage() {
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" sx={{ mb: 3 }}>
-          Tasks
+          My Purchases
         </Typography>
         <Card>
           <CardContent>
-            <TaskList />
+            {user?.discordId ? (
+              <PurchaseList userId={user.discordId} />
+            ) : (
+              <Typography color="text.secondary">
+                Please connect your Discord account to view your purchases.
+              </Typography>
+            )}
           </CardContent>
         </Card>
       </Box>
-    </Box>
+    </Container>
   );
 } 
