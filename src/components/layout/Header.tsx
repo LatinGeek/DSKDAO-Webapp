@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   Divider,
+  Chip,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -20,12 +21,15 @@ import {
   Settings as SettingsIcon,
   NotificationsNone as NotificationsIcon,
   Login as LoginIcon,
+  LocalActivity as TicketIcon,
 } from '@mui/icons-material';
 import { signIn, signOut, useSession } from 'next-auth/react';
+import { useUser } from '@/contexts/UserContext';
 import { useState } from 'react';
 
 export default function Header() {
   const { data: session } = useSession();
+  const { userData } = useUser();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -100,6 +104,19 @@ export default function Header() {
 
         {session ? (
           <>
+            <Chip
+              icon={<TicketIcon />}
+              label={`${userData?.balance || 0} Tickets`}
+              color="primary"
+              sx={{
+                fontWeight: 600,
+                px: 1,
+                '& .MuiChip-icon': {
+                  color: 'inherit',
+                },
+              }}
+            />
+
             <IconButton color="inherit">
               <NotificationsIcon />
             </IconButton>
@@ -144,6 +161,9 @@ export default function Header() {
                 </Typography>
                 <Typography variant="body2" color="text.secondary" noWrap>
                   {session.user?.email}
+                </Typography>
+                <Typography variant="body2" color="primary" sx={{ mt: 0.5, fontWeight: 600 }}>
+                  Balance: {userData?.balance || 0} Tickets
                 </Typography>
               </Box>
               <Divider />

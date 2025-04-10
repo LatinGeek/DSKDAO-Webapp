@@ -14,8 +14,12 @@ import {
   DialogContent,
   DialogActions,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
+import { useSession } from 'next-auth/react';
+import { useUser } from '@/contexts/UserContext';
+import { purchaseItem } from '@/services/purchase';
 
 interface Item {
   id: string;
@@ -32,21 +36,36 @@ interface ItemCardProps {
 }
 
 export default function ItemCard({ item }: ItemCardProps) {
+  const { data: session } = useSession();
+  const { userData } = useUser();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handlePurchase = async () => {
+    if (!session?.user?.id) {
+      setError('Please sign in to make a purchase');
+      return;
+    }
+
     setLoading(true);
+    setError(null);
+
     try {
-      // Implement purchase logic here
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulated API call
+      await purchaseItem(session.user.id, {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+      });
       setOpen(false);
-    } catch (error) {
-      console.error('Purchase failed:', error);
+    } catch (err: any) {
+      setError(err.message || 'Failed to purchase item');
     } finally {
       setLoading(false);
     }
   };
+
+  const canAfford = userData?.balance !== undefined && userData.balance >= item.price;
 
   return (
     <>
@@ -94,16 +113,17 @@ export default function ItemCard({ item }: ItemCardProps) {
           <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Chip
               label={`${item.price} ${item.currency}`}
-              color="primary"
+              color={canAfford ? 'primary' : 'error'}
               sx={{ fontWeight: 'medium' }}
             />
             <Button
               variant="contained"
               startIcon={<ShoppingCartIcon />}
               onClick={() => setOpen(true)}
-              disabled={item.stock === 0}
+              disabled={item.stock === 0 || !session || !canAfford}
+              color={canAfford ? 'primary' : 'error'}
             >
-              Purchase
+              {!session ? 'Sign in to buy' : canAfford ? 'Purchase' : 'Insufficient balance'}
             </Button>
           </Box>
         </CardContent>
@@ -112,9 +132,17 @@ export default function ItemCard({ item }: ItemCardProps) {
       <Dialog open={open} onClose={() => !loading && setOpen(false)}>
         <DialogTitle>Confirm Purchase</DialogTitle>
         <DialogContent>
-          <Typography variant="body1">
+          <Typography variant="body1" paragraph>
             Are you sure you want to purchase {item.name} for {item.price} {item.currency}?
           </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Your balance after purchase will be {userData?.balance ? userData.balance - item.price : 0} {item.currency}
+          </Typography>
+          {error && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {error}
+            </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)} disabled={loading}>
@@ -123,7 +151,7 @@ export default function ItemCard({ item }: ItemCardProps) {
           <Button
             onClick={handlePurchase}
             variant="contained"
-            disabled={loading}
+            disabled={loading || !canAfford}
             startIcon={loading ? <CircularProgress size={20} /> : <ShoppingCartIcon />}
           >
             {loading ? 'Processing...' : 'Confirm Purchase'}
