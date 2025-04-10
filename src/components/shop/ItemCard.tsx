@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import {
-  Card,
   CardContent,
   CardMedia,
   Typography,
@@ -19,20 +18,19 @@ import {
 import { ShoppingCart as ShoppingCartIcon } from '@mui/icons-material';
 import { useSession } from 'next-auth/react';
 import { useUser } from '@/contexts/UserContext';
-import { purchaseItem } from '@/services/purchase';
-
-interface Item {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  currency: string;
-  stock: number;
-}
+import { purchaseItem } from '@/services/shopService';
+import BaseCard from '../common/BaseCard';
 
 interface ItemCardProps {
-  item: Item;
+  item: {
+    id: string;
+    name: string;
+    description: string;
+    price: number;
+    currency: string;
+    image: string;
+    stock: number;
+  };
 }
 
 export default function ItemCard({ item }: ItemCardProps) {
@@ -69,42 +67,39 @@ export default function ItemCard({ item }: ItemCardProps) {
 
   return (
     <>
-      <Card
-        sx={{
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          position: 'relative',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            transition: 'transform 0.2s ease-in-out',
-          },
-        }}
+      <BaseCard
+        hoverEffect
+        noPadding
+        gradient
+        sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
       >
-        <CardMedia
-          component="img"
-          height="200"
-          image={item.image}
-          alt={item.name}
-          sx={{ objectFit: 'cover' }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 12,
-            right: 12,
-            bgcolor: 'background.paper',
-            borderRadius: 1,
-            px: 1,
-            py: 0.5,
-          }}
-        >
-          <Typography variant="body2" fontWeight="medium">
-            {item.stock} left
-          </Typography>
+        <Box sx={{ position: 'relative' }}>
+          <CardMedia
+            component="img"
+            height="200"
+            image={item.image}
+            alt={item.name}
+            sx={{ objectFit: 'cover' }}
+          />
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 12,
+              right: 12,
+              bgcolor: 'background.paper',
+              borderRadius: 1,
+              px: 1,
+              py: 0.5,
+              boxShadow: 1,
+            }}
+          >
+            <Typography variant="body2" fontWeight="medium">
+              {item.stock} left
+            </Typography>
+          </Box>
         </Box>
-        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-          <Typography gutterBottom variant="h6" component="div">
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', p: 3 }}>
+          <Typography gutterBottom variant="h6" sx={{ fontWeight: 600 }}>
             {item.name}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
@@ -127,9 +122,18 @@ export default function ItemCard({ item }: ItemCardProps) {
             </Button>
           </Box>
         </CardContent>
-      </Card>
+      </BaseCard>
 
-      <Dialog open={open} onClose={() => !loading && setOpen(false)}>
+      <Dialog
+        open={open}
+        onClose={() => !loading && setOpen(false)}
+        PaperProps={{
+          sx: {
+            bgcolor: 'background.paper',
+            backgroundImage: 'none',
+          }
+        }}
+      >
         <DialogTitle>Confirm Purchase</DialogTitle>
         <DialogContent>
           <Typography variant="body1" paragraph>

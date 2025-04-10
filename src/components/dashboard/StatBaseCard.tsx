@@ -1,4 +1,5 @@
-import { Card, CardContent, Box, Typography, LinearProgress } from '@mui/material';
+import { Box, Typography, LinearProgress } from '@mui/material';
+import BaseCard from '../common/BaseCard';
 
 interface StatBaseCardProps {
   title: string;
@@ -16,13 +17,15 @@ export default function StatBaseCard({
   children 
 }: StatBaseCardProps) {
   return (
-    <Card sx={{ height: '100%', minHeight: '180px', display: 'flex', flexDirection: 'column' }}>
-      <CardContent sx={{ 
+    <BaseCard
+      gradient
+      sx={{ height: '100%', minHeight: '180px', display: 'flex', flexDirection: 'column' }}
+    >
+      <Box sx={{ 
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        p: 3
       }}>
         <Box>
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -72,7 +75,7 @@ export default function StatBaseCard({
             },
           }}
         />
-      </CardContent>
-    </Card>
+      </Box>
+    </BaseCard>
   );
 } 
