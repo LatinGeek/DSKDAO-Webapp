@@ -1,3 +1,5 @@
+import { FC } from 'react';
+import { formatPrice } from '../utils/format';
 import {
   Card,
   CardContent,
@@ -5,77 +7,81 @@ import {
   Typography,
   Button,
   Box,
-  Chip,
-  CardActions
+  styled,
 } from '@mui/material';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Item } from '@/types/item';
-import { generatePlaceholderImage } from '@/utils/images';
-import TicketPrice from '@/components/common/TicketPrice';
 
 interface ItemCardProps {
   item: Item;
-  onPurchase: () => void;
+  onAddToCart: (itemId: string) => void;
+  disabled?: boolean;
 }
 
-export default function ItemCard({ item, onPurchase }: ItemCardProps) {
-  const isOutOfStock = item.amount === 0;
-  const imageUrl = item.image && item.image.trim() !== '' 
-    ? item.image 
-    : generatePlaceholderImage(item.name);
+const StyledCard = styled(Card)(({ theme }) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  transition: 'transform 0.2s ease-in-out',
+  '&:hover': {
+    transform: 'scale(1.02)',
+  },
+}));
+
+const ItemCard: FC<ItemCardProps> = ({ item, onAddToCart, disabled }) => {
+  const { id, name, description, image, price, amount } = item;
 
   return (
-    <Card 
-      sx={{ 
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        '&:hover': {
-          transform: 'translateY(-4px)',
-          transition: 'transform 0.2s ease-in-out',
-        }
-      }}
-    >
+    <StyledCard>
       <CardMedia
         component="img"
         height="200"
-        image={imageUrl}
-        alt={item.name}
-        sx={{ 
-          objectFit: 'contain',
-          bgcolor: 'background.paper',
-          p: item.image ? 0 : 2 // Add padding for placeholder images
-        }}
+        image={image}
+        alt={name}
+        sx={{ objectFit: 'contain', p: 2, bgcolor: 'background.paper' }}
       />
-      
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-          <Typography gutterBottom variant="h6" component="h2" sx={{ mb: 0 }}>
-            {item.name}
-          </Typography>
-          <Chip
-            label={isOutOfStock ? 'Out of Stock' : `${item.amount} left`}
-            color={isOutOfStock ? 'error' : 'primary'}
-            size="small"
-          />
-        </Box>
-
-        <Typography variant="body2" color="text.secondary" paragraph>
-          {item.description}
+      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+        <Typography gutterBottom variant="h6" component="h2" noWrap>
+          {name}
         </Typography>
-
-        <TicketPrice amount={item.price} size="large" />
-      </CardContent>
-
-      <CardActions>
-        <Button
-          fullWidth
-          variant="contained"
-          onClick={onPurchase}
-          disabled={isOutOfStock}
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            mb: 2,
+          }}
         >
-          {isOutOfStock ? 'Out of Stock' : 'Purchase'}
-        </Button>
-      </CardActions>
-    </Card>
+          {description}
+        </Typography>
+        <Box
+          sx={{
+            mt: 'auto',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6" color="primary">
+            {formatPrice(price)}
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<ShoppingCartIcon />}
+            onClick={() => onAddToCart(id)}
+            disabled={disabled || amount === 0}
+            size="small"
+          >
+            {amount === 0 ? 'Out of Stock' : 'Add to Cart'}
+          </Button>
+        </Box>
+      </CardContent>
+    </StyledCard>
   );
-} 
+};
+
+export default ItemCard; 

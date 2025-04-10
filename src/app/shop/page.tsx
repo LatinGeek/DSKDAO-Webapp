@@ -5,68 +5,39 @@ import { useItems } from '@/hooks/useItems';
 import ItemCard from '@/components/ItemCard';
 import { purchaseItem } from '@/services/purchaseService';
 import { updateUserBalance, InsufficientBalanceError, UserNotFoundError } from '@/services/userService';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Item } from '@/types/item';
 import { useAuth } from '@/hooks/useAuth';
-
-// Helper function to generate placeholder images
-const getPlaceholderImage = (name: string, color: string = '0075FF') => {
-  // Using UI Avatars to generate placeholder images
-  // Format: square images with item name as text, using our theme's primary color
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=${color}&color=fff&size=200&bold=true&format=svg`;
-};
-
-const items = [
-  {
-    id: '1',
-    name: 'Premium Membership',
-    description: 'Access exclusive content and features',
-    price: 500,
-    image: getPlaceholderImage('Premium', '6366f1'),
-    currency: 'POINTS',
-    stock: 999,
-  },
-  {
-    id: '2',
-    name: 'Rare Avatar',
-    description: 'Limited edition profile picture',
-    price: 1000,
-    image: getPlaceholderImage('Avatar', '06b6d4'),
-    currency: 'POINTS',
-    stock: 50,
-  },
-  {
-    id: '3',
-    name: 'Custom Role',
-    description: 'Create your own Discord role',
-    price: 2000,
-    image: getPlaceholderImage('Role', 'f59e0b'),
-    currency: 'POINTS',
-    stock: 10,
-  },
-  {
-    id: '4',
-    name: 'Server Boost',
-    description: '1 month of server boosting',
-    price: 3000,
-    image: getPlaceholderImage('Boost', '10b981'),
-    currency: 'POINTS',
-    stock: 100,
-  },
-];
+import PurchasePopup from '@/components/common/PurchasePopup';
 
 export default function ShopPage() {
   const { items, loading, error } = useItems();
   const { user } = useAuth();
   const [purchaseStatus, setPurchaseStatus] = useState<{
+    show: boolean;
     type: 'success' | 'error';
     message: string;
+    itemName: string;
+    price?: number;
   } | null>(null);
+
+  // Auto-hide the popup after 5 seconds
+  useEffect(() => {
+    if (purchaseStatus?.show) {
+      const timer = setTimeout(() => {
+        setPurchaseStatus(prev => prev ? { ...prev, show: false } : null);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [purchaseStatus?.show]);
 
   const handlePurchase = async (item: Item) => {
     if (!user?.discordId) {
       setPurchaseStatus({
+        show: true,
         type: 'error',
+        itemName: item.name,
         message: 'Please connect your Discord account to make purchases'
       });
       return;
@@ -80,28 +51,37 @@ export default function ShopPage() {
       await purchaseItem({
         itemId: item.id,
         quantity: 1,
-        userId: user.discordId // Use Discord ID for purchase record
+        userId: user.discordId
       });
 
       setPurchaseStatus({
+        show: true,
         type: 'success',
-        message: `Successfully purchased ${item.name}!`
+        itemName: item.name,
+        price: item.price,
+        message: 'Your purchase was successful!'
       });
     } catch (error) {
       // Handle specific error types
       if (error instanceof InsufficientBalanceError) {
         setPurchaseStatus({
+          show: true,
           type: 'error',
+          itemName: item.name,
           message: 'Insufficient balance to complete this purchase'
         });
       } else if (error instanceof UserNotFoundError) {
         setPurchaseStatus({
+          show: true,
           type: 'error',
+          itemName: item.name,
           message: 'Your Discord account is not registered in our system. Please link your account first.'
         });
       } else {
         setPurchaseStatus({
+          show: true,
           type: 'error',
+          itemName: item.name,
           message: error instanceof Error ? error.message : 'Failed to purchase item'
         });
       }
@@ -135,13 +115,13 @@ export default function ShopPage() {
       {getAuthAlert()}
 
       {purchaseStatus && (
-        <Alert 
-          severity={purchaseStatus.type}
-          onClose={() => setPurchaseStatus(null)}
-          sx={{ mb: 2 }}
-        >
-          {purchaseStatus.message}
-        </Alert>
+        <PurchasePopup
+          show={purchaseStatus.show}
+          type={purchaseStatus.type}
+          itemName={purchaseStatus.itemName}
+          price={purchaseStatus.price}
+          message={purchaseStatus.message}
+        />
       )}
 
       {error && (
@@ -160,7 +140,7 @@ export default function ShopPage() {
             <Grid item key={item.id} xs={12} sm={6} md={4}>
               <ItemCard
                 item={item}
-                onPurchase={() => handlePurchase(item)}
+                onAddToCart={() => handlePurchase(item)}
                 disabled={!user?.discordId}
               />
             </Grid>

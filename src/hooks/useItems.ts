@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Item } from '@/types/item';
+import { getPlaceholderImage } from '@/utils/images';
 
 export const useItems = () => {
   const [items, setItems] = useState<Item[]>([]);
@@ -18,10 +19,14 @@ export const useItems = () => {
         );
         
         const querySnapshot = await getDocs(itemsQuery);
-        const fetchedItems = querySnapshot.docs.map(doc => ({
-          ...doc.data(),
-          id: doc.id
-        })) as Item[];
+        const fetchedItems = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            ...data,
+            id: doc.id,
+            image: data.image?.trim() ? data.image : getPlaceholderImage(data.name)
+          };
+        }) as Item[];
 
         setItems(fetchedItems);
         setError(null);
