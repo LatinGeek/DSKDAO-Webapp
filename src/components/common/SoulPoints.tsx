@@ -1,5 +1,5 @@
 import { Box, Typography, SxProps, Theme } from '@mui/material';
-import { Stars as SoulPointsIcon } from '@mui/icons-material';
+import { Whatshot as SoulPointsIcon } from '@mui/icons-material';
 
 interface SoulPointsProps {
   amount: number;

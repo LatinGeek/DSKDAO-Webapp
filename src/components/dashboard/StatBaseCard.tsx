@@ -19,7 +19,7 @@ export default function StatBaseCard({
   return (
     <BaseCard
       gradient
-      sx={{ height: '100%', minHeight: '180px', display: 'flex', flexDirection: 'column' }}
+      sx={{ height: '100%', minHeight: '150px', display: 'flex', flexDirection: 'column' }}
     >
       <Box sx={{ 
         height: '100%',
@@ -63,18 +63,20 @@ export default function StatBaseCard({
             {children}
           </Box>
         </Box>
-        <LinearProgress
-          variant="determinate"
-          value={progressValue}
-          sx={{
-            height: 6,
-            borderRadius: 3,
-            bgcolor: 'background.default',
-            '& .MuiLinearProgress-bar': {
+        {progressValue != -1 && (
+          <LinearProgress
+            variant="determinate"
+            value={progressValue}
+            sx={{
+              height: 6,
               borderRadius: 3,
-            },
-          }}
-        />
+              bgcolor: 'background.default',
+              '& .MuiLinearProgress-bar': {
+                borderRadius: 3,
+              },
+            }}
+          />
+        )}
       </Box>
     </BaseCard>
   );

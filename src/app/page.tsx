@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Card, CardContent, Grid, Typography, Container } from '@mui/material';
-import { Battery50, Stars } from '@mui/icons-material';
+import { Battery50, Stars, Whatshot } from '@mui/icons-material';
 import { useAuth } from '@/hooks/useAuth';
 import PurchaseList from '@/components/dashboard/PurchaseList';
 import BalanceCard from '@/components/dashboard/BalanceCard';
@@ -23,7 +23,7 @@ export default function DashboardPage() {
         <Grid item xs={12} sm={6} md={3}>
           <BalanceCard 
             balance={user?.balance || 0}
-            change="+55%"
+            
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
@@ -32,8 +32,8 @@ export default function DashboardPage() {
         <Grid item xs={12} sm={6} md={3}>
           <StatBaseCard
             title="Soul-Bound Points"
-            icon={<Stars sx={{ color: 'primary.main' }} />}
-            change="+12%"
+            icon={<Whatshot sx={{ color: '#fff' }} />}
+            progressValue={-1}
           >
             <SoulPoints amount={1250} size="large" />
           </StatBaseCard>
@@ -42,8 +42,7 @@ export default function DashboardPage() {
           <StatBaseCard
             title="Battery Health"
             icon={<Battery50 sx={{ color: '#fff' }} />}
-            change="-11%"
-            progressValue={76}
+            progressValue={-1}
           >
             <Typography variant="h4" sx={{ mb: 2 }}>
               76%

@@ -46,7 +46,7 @@ export default function UserRoles() {
       <StatBaseCard
         title="Discord Roles"
         icon={<TagIcon sx={{ color: '#fff' }} />}
-        progressValue={0}
+        progressValue={-1}
       >
         <Typography sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
           Please connect your Discord account to view your roles
@@ -60,7 +60,7 @@ export default function UserRoles() {
       <StatBaseCard
         title="Discord Roles"
         icon={<TagIcon sx={{ color: '#fff' }} />}
-        progressValue={70}
+        progressValue={-1}
       >
         <Box display="flex" justifyContent="center" py={1}>
           <CircularProgress size={24} />
@@ -74,7 +74,7 @@ export default function UserRoles() {
       <StatBaseCard
         title="Discord Roles"
         icon={<TagIcon sx={{ color: '#fff' }} />}
-        progressValue={0}
+        progressValue={-1}
       >
         <Typography color="error" sx={{ fontSize: '0.875rem' }}>
           {error}
@@ -83,14 +83,12 @@ export default function UserRoles() {
     );
   }
 
-  const progressValue = (roles.length / 5) * 100; // Assuming 5 is the max number of roles
 
   return (
     <StatBaseCard
       title="Discord Roles"
       icon={<TagIcon sx={{ color: '#fff' }} />}
-      progressValue={progressValue}
-      change={`${roles.length} roles`}
+      progressValue={-1}
     >
       {roles.length > 0 ? (
         <Box 
