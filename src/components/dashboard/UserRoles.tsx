@@ -92,7 +92,7 @@ export default function UserRoles() {
             flexWrap: 'wrap',
             gap: 1,
             alignItems: 'center',
-            justifyContent: { xs: 'flex-end', sm: 'center' },
+            justifyContent: { xs: 'flex-end', sm: 'left' },
             width: { xs: 'auto', sm: '100%' },
             overflowX: 'auto',
             '&::-webkit-scrollbar': {

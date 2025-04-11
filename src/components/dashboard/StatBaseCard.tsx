@@ -28,32 +28,20 @@ export default function StatBaseCard({
         width: '100%',
         height: '100%',
         display: 'flex',
-        flexDirection: { xs: 'row', sm: 'column' },
-        alignItems: { xs: 'center', sm: 'stretch' },
-        gap: { xs: 2, sm: 0 },
+        flexDirection: { xs: 'row', sm: 'row' },
+        alignItems: { xs: 'center', sm: 'center' },
+        gap: { xs: 2, sm: 2 },
         justifyContent: { xs: 'space-between', sm: 'space-between' }
       }}>
-        {/* Title Section */}
+        {/* Content Section */}
         <Box sx={{ 
           display: 'flex',
-          alignItems: 'center',
-          gap: 1,
-          minWidth: { xs: 'fit-content', sm: '100%' },
-          justifyContent: { sm: 'center' },
-          flex: { xs: 'initial', sm: '0 0 auto' }
+          flexDirection: 'column',
+          alignItems: { xs: 'flex-start', sm: 'flex-start' },
+          justifyContent: 'center',
+          gap: 0.5
         }}>
-          <Box
-            sx={{
-              p: 1,
-              borderRadius: 1,
-              bgcolor: 'primary.main',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {icon}
-          </Box>
+          {/* Title */}
           <Typography 
             variant="body1" 
             color="text.secondary"
@@ -63,46 +51,44 @@ export default function StatBaseCard({
           >
             {title}
           </Typography>
-        </Box>
 
-        {/* Content Section */}
-        <Box sx={{ 
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: { xs: 'flex-end', sm: 'center' },
-          justifyContent: 'center',
-          gap: 1,
-          flex: { xs: '1 1 auto', sm: '1 1 auto' },
-          width: '100%',
-          minHeight: { sm: '70px' }
-        }}>
           {/* Main Content */}
           <Box sx={{ 
             display: 'flex',
             alignItems: 'center',
-            justifyContent: { xs: 'flex-end', sm: 'center' },
-            width: '100%'
+            gap: 1
           }}>
             {children}
+            {change && (
+              <Typography
+                variant="body2"
+                sx={{
+                  color: change.startsWith('+') ? 'success.main' : 'error.main',
+                  whiteSpace: 'nowrap',
+                  fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                  display: 'flex',
+                  alignItems: 'center'
+                }}
+              >
+                {change}
+              </Typography>
+            )}
           </Box>
+        </Box>
 
-          {/* Change Indicator */}
-          {change && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: change.startsWith('+') ? 'success.main' : 'error.main',
-                whiteSpace: 'nowrap',
-                fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: { xs: 'flex-end', sm: 'center' },
-                width: '100%'
-              }}
-            >
-              {change}
-            </Typography>
-          )}
+        {/* Icon Section */}
+        <Box
+          sx={{
+            p: 1,
+            borderRadius: 1,
+            bgcolor: 'primary.main',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}
+        >
+          {icon}
         </Box>
       </Box>
     </BaseCard>
