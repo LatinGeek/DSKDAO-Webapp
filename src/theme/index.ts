@@ -109,7 +109,7 @@ const theme = createTheme({
       styleOverrides: {
         paper: {
           backdropFilter: 'blur(10px)',
-          backgroundColor: 'rgba(17, 28, 68, 0.7) !important',
+          backgroundColor: 'rgba(17, 28, 68, 0.2) !important',
           borderRight: '1px solid rgba(255, 255, 255, 0.08)',
         },
       },

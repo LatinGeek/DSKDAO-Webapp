@@ -39,26 +39,26 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" p={4}>
+      <Box display="flex" justifyContent="center" p={3}>
         <CircularProgress />
       </Box>
     );
   }
 
   if (error) {
-    return <Alert severity="error">{error}</Alert>;
+    return <Alert severity="error" sx={{ p: 2 }}>{error}</Alert>;
   }
 
   if (purchases.length === 0) {
     return (
-      <Alert severity="info">
+      <Alert severity="info" sx={{ p: 2 }}>
         You haven't made any purchases yet. Visit the shop to get started!
       </Alert>
     );
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       {purchases.map((purchase) => {
         const itemName = purchase.item?.name || `Item #${purchase.itemId.slice(-6)}`;
         
@@ -67,10 +67,11 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
             key={purchase.id} 
             sx={{ 
               overflow: 'visible',
-              boxShadow: 'none'
+              boxShadow: 'none',
+              backgroundColor: 'none',
             }}
           >
-            <CardContent>
+            <CardContent sx={{ p: 3 }}>
               <Grid container spacing={3}>
                 {/* Item Image */}
                 <Grid item xs={12} sm={3}>
@@ -92,10 +93,10 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                 <Grid item xs={12} sm={9}>
                   <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                     <Box>
-                      <Typography variant="h6" gutterBottom>
+                      <Typography variant="h6" sx={{ mb: 1 }}>
                         {itemName}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         Order #{purchase.id.slice(-6)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
@@ -113,11 +114,11 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                     </Box>
                   </Box>
 
-                  <Divider sx={{ my: 2 }} />
+                  <Divider sx={{ my: 3 }} />
 
-                  <Grid container spacing={2}>
+                  <Grid container spacing={3}>
                     <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         Quantity: {purchase.quantity}
                       </Typography>
                       {purchase.item?.description && (
@@ -125,7 +126,6 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                           variant="body2"
                           color="text.secondary"
                           sx={{
-                            mt: 1,
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             display: '-webkit-box',
@@ -139,7 +139,7 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Box display="flex" flexDirection="column" alignItems="flex-end">
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                           Price per item:
                         </Typography>
                         <TicketPrice amount={purchase.totalPrice / purchase.quantity} size="small" />

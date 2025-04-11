@@ -42,7 +42,7 @@ export default function StatBaseCard({
               >
                 {icon}
               </Box>
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body1" color="text.secondary">
                 {title}
               </Typography>
             </Box>
