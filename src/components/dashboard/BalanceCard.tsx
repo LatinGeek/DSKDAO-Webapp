@@ -13,7 +13,6 @@ export default function BalanceCard({ balance, change }: BalanceCardProps) {
       title="Current Balance"
       icon={<TicketIcon sx={{ color: '#fff' }} />}
       change={change}
-      progressValue={-1}
     >
       <TicketPrice amount={balance} size="large" />
     </StatBaseCard>

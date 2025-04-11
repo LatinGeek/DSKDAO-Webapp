@@ -26,20 +26,21 @@ export default function StatBaseCard({
     >
       <Box sx={{ 
         width: '100%',
+        height: '100%',
         display: 'flex',
         flexDirection: { xs: 'row', sm: 'column' },
-        alignItems: { xs: 'center', sm: 'flex-start' },
-        gap: { xs: 2, sm: 2 },
-        justifyContent: { xs: 'space-between', sm: 'flex-start' },
-        height: '100%'
+        alignItems: { xs: 'center', sm: 'stretch' },
+        gap: { xs: 2, sm: 0 },
+        justifyContent: { xs: 'space-between', sm: 'space-between' }
       }}>
-        {/* Left Section: Icon and Title */}
+        {/* Title Section */}
         <Box sx={{ 
           display: 'flex',
           alignItems: 'center',
           gap: 1,
           minWidth: { xs: 'fit-content', sm: '100%' },
-          mb: { sm: 2 }
+          justifyContent: { sm: 'center' },
+          flex: { xs: 'initial', sm: '0 0 auto' }
         }}>
           <Box
             sx={{
@@ -64,21 +65,23 @@ export default function StatBaseCard({
           </Typography>
         </Box>
 
-        {/* Right Section: Content and Change */}
+        {/* Content Section */}
         <Box sx={{ 
           display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          flex: { xs: '1 1 auto', sm: 'initial' },
-          width: { sm: '100%' },
-          justifyContent: { xs: 'flex-end', sm: 'flex-start' }
+          flexDirection: 'column',
+          alignItems: { xs: 'flex-end', sm: 'center' },
+          justifyContent: 'center',
+          gap: 1,
+          flex: { xs: '1 1 auto', sm: '1 1 auto' },
+          width: '100%',
+          minHeight: { sm: '70px' }
         }}>
-          {/* Content */}
+          {/* Main Content */}
           <Box sx={{ 
             display: 'flex',
             alignItems: 'center',
-            maxWidth: { xs: '70%', sm: '100%' },
-            overflow: 'hidden'
+            justifyContent: { xs: 'flex-end', sm: 'center' },
+            width: '100%'
           }}>
             {children}
           </Box>
@@ -93,8 +96,8 @@ export default function StatBaseCard({
                 fontSize: { xs: '0.75rem', sm: '0.875rem' },
                 display: 'flex',
                 alignItems: 'center',
-                ml: { xs: 1, sm: 'auto' },
-                mt: { sm: 2 }
+                justifyContent: { xs: 'flex-end', sm: 'center' },
+                width: '100%'
               }}
             >
               {change}

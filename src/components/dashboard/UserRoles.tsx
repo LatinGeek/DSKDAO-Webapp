@@ -92,7 +92,8 @@ export default function UserRoles() {
             flexWrap: 'wrap',
             gap: 1,
             alignItems: 'center',
-            width: '100%',
+            justifyContent: { xs: 'flex-end', sm: 'center' },
+            width: { xs: 'auto', sm: '100%' },
             overflowX: 'auto',
             '&::-webkit-scrollbar': {
               height: '4px',
@@ -105,7 +106,8 @@ export default function UserRoles() {
               background: 'rgba(255,255,255,0.2)',
               borderRadius: '2px',
             },
-            pb: 1 // Add padding to show scrollbar
+            pb: 1, // Add padding to show scrollbar
+            ml: { xs: 'auto', sm: 0 } // Push content to the right on mobile
           }}
         >
           {roles.map((role) => (
