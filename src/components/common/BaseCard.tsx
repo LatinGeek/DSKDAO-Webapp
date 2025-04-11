@@ -13,7 +13,6 @@ const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => 
     !['gradient', 'noPadding', 'borderIndicator', 'borderIndicatorColor', 'hoverEffect'].includes(prop as string),
 })<BaseCardProps>(({ theme, gradient, noPadding, borderIndicator, borderIndicatorColor, hoverEffect }) => ({
-  backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius * 2,
   position: 'relative',
   transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
@@ -27,7 +26,6 @@ const StyledCard = styled(Card, {
       inset: 0,
       borderRadius: 'inherit',
       padding: '1px',
-      background: `linear-gradient(127.09deg, ${alpha(theme.palette.primary.main, 0.15)} 19.41%, ${alpha(theme.palette.secondary.main, 0.15)} 76.65%)`,
       WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
       WebkitMaskComposite: 'destination-out',
       maskComposite: 'exclude',

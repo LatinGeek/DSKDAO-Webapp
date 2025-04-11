@@ -68,7 +68,6 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
             sx={{ 
               overflow: 'visible',
               boxShadow: 'none',
-              backgroundColor: 'none',
             }}
           >
             <CardContent sx={{ p: 3 }}>
@@ -83,7 +82,6 @@ const PurchaseList: FC<PurchaseListProps> = ({ userId }) => {
                       height: 140,
                       width: '100%',
                       objectFit: 'contain',
-                      bgcolor: 'background.default',
                       borderRadius: 1,
                     }}
                   />

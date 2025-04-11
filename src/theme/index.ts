@@ -100,8 +100,10 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           backdropFilter: 'blur(10px)',
-          backgroundColor: 'rgba(17, 28, 68, 0.7)',
+          backgroundColor: 'rgba(17, 28, 68, 0.3)',
           borderRadius: 16,
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundImage: 'none'
         },
       },
     },
@@ -136,7 +138,7 @@ const theme = createTheme({
         root: {
           borderRadius: 8,
           '&.Mui-selected': {
-            backgroundColor: '#0075FF',
+            backgroundColor: '#171d3f!important',
             '&:hover': {
               backgroundColor: '#0052B2',
             },

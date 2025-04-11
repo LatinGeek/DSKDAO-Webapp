@@ -40,7 +40,7 @@ export default function NFTGallery() {
   // Don't render anything until mounted to prevent hydration errors
   if (!mounted) {
     return (
-      <Card>
+      <Card className="card-transparent"> 
         <CardContent>
           <Typography variant="h6" sx={{ mb: 3 }}>
             Loading...
@@ -68,7 +68,7 @@ export default function NFTGallery() {
 
   if (!isConnected) {
     return (
-      <Card>
+      <Card className="card-transparent">
         <CardContent>
           <Typography color="text.secondary">
             Please connect your wallet to view your NFTs.
@@ -79,7 +79,7 @@ export default function NFTGallery() {
   }
 
   return (
-    <Card>
+    <Card className="card-transparent">
       <CardContent>
 
         

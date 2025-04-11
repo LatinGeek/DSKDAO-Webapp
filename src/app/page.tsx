@@ -70,7 +70,7 @@ export default function DashboardPage() {
         <Typography variant="h4" sx={{ mb: 3 }}>
           My Purchases
         </Typography>
-        <Card>
+        <Card className="card-transparent">
           <CardContent>
             {user?.discordId ? (
               <PurchaseList userId={user.discordId} />

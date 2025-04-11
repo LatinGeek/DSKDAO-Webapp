@@ -56,9 +56,10 @@ export default function Header() {
     <AppBar
       position="fixed"
       sx={{
+        backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.04))',
         width: { sm: isSidebarOpen ? `calc(100% - ${DRAWER_WIDTH}px)` : '100%' },
         ml: { sm: isSidebarOpen ? `${DRAWER_WIDTH}px` : 0 },
-        bgcolor: 'background.paper',
+        bgcolor: 'background',
         boxShadow: 'none',
         borderBottom: '1px solid',
         borderColor: 'divider',
@@ -90,25 +91,7 @@ export default function Header() {
 
         <Box sx={{ flex: 1 }} />
 
-        <TextField
-          placeholder="Type here..."
-          size="small"
-          sx={{
-            maxWidth: 400,
-            width: '100%',
-            '& .MuiOutlinedInput-root': {
-              bgcolor: 'background.default',
-              borderRadius: 2,
-            }
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: 'text.secondary' }} />
-              </InputAdornment>
-            ),
-          }}
-        />
+
 
         <Box sx={{ flex: 1 }} />
 
