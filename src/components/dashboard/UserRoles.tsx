@@ -106,8 +106,8 @@ export default function UserRoles() {
               background: 'rgba(255,255,255,0.2)',
               borderRadius: '2px',
             },
-            pb: 1, // Add padding to show scrollbar
-            ml: { xs: 'auto', sm: 0 } // Push content to the right on mobile
+            pb: 1,
+            ml: { xs: 'auto', sm: 0 }
           }}
         >
           {roles.map((role) => (
@@ -122,8 +122,14 @@ export default function UserRoles() {
                 size="small"
                 sx={{
                   backgroundColor: getRoleColor(role.color),
-                  width: '36px',
-                  height: '36px',
+                  width: { 
+                    xs: roles.length > 4 ? '28px' : '32px',
+                    sm: roles.length > 4 ? '30px' : '36px'
+                  },
+                  height: { 
+                    xs: roles.length > 4 ? '28px' : '32px',
+                    sm: roles.length > 4 ? '30px' : '36px'
+                  },
                   padding: 0,
                   flexShrink: 0,
                   '&:hover': {
@@ -134,6 +140,10 @@ export default function UserRoles() {
                   transition: 'transform 0.2s ease-in-out',
                   '& svg': {
                     color: '#FFFFFF',
+                    fontSize: {
+                      xs: roles.length > 6 ? '1rem' : '1.2rem',
+                      sm: roles.length > 8 ? '1.1rem' : '1.2rem'
+                    }
                   }
                 }}
               >

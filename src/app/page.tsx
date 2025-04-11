@@ -23,15 +23,15 @@ export default function DashboardPage() {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={6}>
           <BalanceCard 
             balance={user?.balance || 0}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={6}>
           <UserRoles />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={6}>
           <StatBaseCard
             title="Soul-Bound Points"
             icon={<Whatshot sx={{ color: '#fff' }} />}
@@ -39,7 +39,7 @@ export default function DashboardPage() {
             <SoulPoints amount={1250} size="large" />
           </StatBaseCard>
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid item xs={12} sm={6} md={6}>
           <StatBaseCard
             title="Experience Points"
             icon={<EmojiEvents sx={{ color: '#fff' }} />}

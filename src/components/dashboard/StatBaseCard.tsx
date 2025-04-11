@@ -19,7 +19,7 @@ export default function StatBaseCard({
       gradient
       sx={{ 
         height: '100%', 
-        minHeight: { xs: '80px', sm: '150px' }, 
+        minHeight: { xs: '80px', sm: '120px' }, 
         display: 'flex',
         p: { xs: 2, sm: 3 }
       }}
