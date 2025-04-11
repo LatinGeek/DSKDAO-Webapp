@@ -40,7 +40,7 @@ export async function fetchNFTMetadata(uri: string): Promise<NFTMetadata> {
     const metadata = await response.json();
     
     // Ensure image URL is properly formatted
-    if (metadata.image && metadata.image.startsWith('ipfs://')) {
+    if (metadata.image?.startsWith('ipfs://')) {
       metadata.image = metadata.image.replace('ipfs://', 'https://ipfs.io/ipfs/');
     }
     
@@ -61,63 +61,25 @@ export async function fetchOwnedNFTs(
 ): Promise<NFTData[]> {
   try {
     const ownedNFTs: NFTData[] = [];
+    const alchemy = new Alchemy(alchemyConfig);
 
-    for (const contractAddress of NFT_CONTRACTS) {
-      try {
-        console.log("Processing contract:", contractAddress);
-        console.log("Checking address:", address);
+    // Get all NFTs owned by the address using Alchemy
+    const alchemyResponse = await alchemy.nft.getNftsForOwner(address);
 
-        // Check if the user has minted an NFT
-        const hasMinted = await readContract(config, {
-          address: contractAddress,
-          abi: NFTABI,
-          functionName: 'isNftMinted',
-          args: [address],
-          chainId: mainnet.id,
-        }) as boolean;
-
-        console.log("Has minted:", hasMinted);
-
-        if (!hasMinted) {
-          console.log("No NFT minted by this address");
-          continue;
+    // Filter NFTs to only include ones from our contract addresses
+    for (const nft of alchemyResponse.ownedNfts) {
+      const contractAddress = nft.contract.address.toLowerCase();
+      if (NFT_CONTRACTS.some(addr => addr.toLowerCase() === contractAddress) && nft.tokenUri) {
+        try {
+          const metadata = await fetchNFTMetadata(nft.tokenUri);
+          ownedNFTs.push({
+            tokenId: nft.tokenId,
+            contractAddress: nft.contract.address as Address,
+            metadata,
+          });
+        } catch (error) {
+          console.error(`Error processing NFT ${nft.tokenId}:`, error);
         }
-
-        // Get total supply to know how many tokens to check
-        const totalSupply = await readContract(config, {
-          address: contractAddress,
-          abi: NFTABI,
-          functionName: 'totalSupply',
-          args: [],
-          chainId: mainnet.id,
-        }) as bigint;
-
-        console.log("Total supply:", totalSupply.toString());
-
-        const alchemy = new Alchemy(alchemyConfig);
-
-
-         //Call the method to get the nfts owned by this address
-        let alchemyResponse = await alchemy.nft.getNftsForOwner(address);
-
-        console.log("NFTs owned by this address:", alchemyResponse);
-        
-        if (alchemyResponse.ownedNfts.length > 0) {
-          for (const nft of alchemyResponse.ownedNfts) {
-            if (nft.contract.address.toLowerCase() === contractAddress.toLowerCase() && nft.tokenUri) {
-              const metadata = await fetchNFTMetadata(nft.tokenUri);
-              ownedNFTs.push({
-                tokenId: nft.tokenId,
-                contractAddress,
-                metadata,
-              });
-            }
-          }
-        }
-
-      } catch (error) {
-        console.error(`Error processing contract ${contractAddress}:`, error);
-        continue;
       }
     }
 

@@ -70,9 +70,6 @@ export default function NFTGallery() {
     return (
       <Card>
         <CardContent>
-          <Typography variant="h6" sx={{ mb: 3 }}>
-            Your NFTs
-          </Typography>
           <Typography color="text.secondary">
             Please connect your wallet to view your NFTs.
           </Typography>
@@ -84,9 +81,7 @@ export default function NFTGallery() {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" sx={{ mb: 3 }}>
-          Your NFTs
-        </Typography>
+
         
         <Grid container spacing={3}>
           {loading ? (
