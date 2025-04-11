@@ -3,6 +3,14 @@ import { readContract } from 'wagmi/actions';
 import { NFTABI } from '../../contracts/membership_pass';
 import { mainnet } from 'wagmi/chains';
 import { type Config } from 'wagmi';
+// Imports the Alchemy SDK
+import { Alchemy, Network } from "alchemy-sdk";
+
+// Configures the Alchemy SDK
+const alchemyConfig = {
+  apiKey: "BM6e8QFjpTFFqr7QAWMqH3lRcILx85rv", // Replace with your API key
+  network: Network.ETH_MAINNET, // Replace with your network
+};
 
 // Add your NFT contract addresses here
 export const NFT_CONTRACTS: Address[] = [
@@ -86,46 +94,27 @@ export async function fetchOwnedNFTs(
 
         console.log("Total supply:", totalSupply.toString());
 
-        // Check each token ID to find which one belongs to the user
-        for (let i = 1; i <= Number(totalSupply); i++) {
-          try {
-            const currentOwner = await readContract(config, {
-              address: contractAddress,
-              abi: NFTABI,
-              functionName: 'ownerOf',
-              args: [BigInt(i)],
-              chainId: mainnet.id,
-            }) as Address;
+        const alchemy = new Alchemy(alchemyConfig);
 
-            // If we found the token owned by this address
-            if (currentOwner.toLowerCase() === address.toLowerCase()) {
-              // Get token URI
-              const tokenUri = await readContract(config, {
-                address: contractAddress,
-                abi: NFTABI,
-                functionName: 'tokenURI',
-                args: [BigInt(i)],
-                chainId: mainnet.id,
-              }) as string;
 
-              console.log("Found token ID:", i, "Token URI:", tokenUri);
+         //Call the method to get the nfts owned by this address
+        let alchemyResponse = await alchemy.nft.getNftsForOwner(address);
 
-              if (tokenUri) {
-                const metadata = await fetchNFTMetadata(tokenUri);
-                ownedNFTs.push({
-                  tokenId: i.toString(),
-                  contractAddress,
-                  metadata,
-                });
-                // Since we know each address can only mint one, we can break after finding it
-                break;
-              }
+        console.log("NFTs owned by this address:", alchemyResponse);
+        
+        if (alchemyResponse.ownedNfts.length > 0) {
+          for (const nft of alchemyResponse.ownedNfts) {
+            if (nft.contract.address.toLowerCase() === contractAddress.toLowerCase() && nft.tokenUri) {
+              const metadata = await fetchNFTMetadata(nft.tokenUri);
+              ownedNFTs.push({
+                tokenId: nft.tokenId,
+                contractAddress,
+                metadata,
+              });
             }
-          } catch (error) {
-            console.error(`Error checking token ID ${i}:`, error);
-            continue;
           }
         }
+
       } catch (error) {
         console.error(`Error processing contract ${contractAddress}:`, error);
         continue;
