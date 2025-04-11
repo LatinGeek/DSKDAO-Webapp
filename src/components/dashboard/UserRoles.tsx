@@ -46,7 +46,6 @@ export default function UserRoles() {
       <StatBaseCard
         title="Discord Roles"
         icon={<TagIcon sx={{ color: '#fff' }} />}
-        progressValue={-1}
       >
         <Typography sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>
           Please connect your Discord account to view your roles
@@ -60,7 +59,6 @@ export default function UserRoles() {
       <StatBaseCard
         title="Discord Roles"
         icon={<TagIcon sx={{ color: '#fff' }} />}
-        progressValue={-1}
       >
         <Box display="flex" justifyContent="center" py={1}>
           <CircularProgress size={24} />
@@ -74,7 +72,6 @@ export default function UserRoles() {
       <StatBaseCard
         title="Discord Roles"
         icon={<TagIcon sx={{ color: '#fff' }} />}
-        progressValue={-1}
       >
         <Typography color="error" sx={{ fontSize: '0.875rem' }}>
           {error}
@@ -83,20 +80,32 @@ export default function UserRoles() {
     );
   }
 
-
   return (
     <StatBaseCard
       title="Discord Roles"
       icon={<TagIcon sx={{ color: '#fff' }} />}
-      progressValue={-1}
     >
       {roles.length > 0 ? (
         <Box 
           sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, 36px)',
-            gap: '8px',
-            justifyContent: 'start'
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 1,
+            alignItems: 'center',
+            width: '100%',
+            overflowX: 'auto',
+            '&::-webkit-scrollbar': {
+              height: '4px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'rgba(0,0,0,0.1)',
+              borderRadius: '2px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(255,255,255,0.2)',
+              borderRadius: '2px',
+            },
+            pb: 1 // Add padding to show scrollbar
           }}
         >
           {roles.map((role) => (
@@ -114,6 +123,7 @@ export default function UserRoles() {
                   width: '36px',
                   height: '36px',
                   padding: 0,
+                  flexShrink: 0,
                   '&:hover': {
                     backgroundColor: getRoleColor(role.color),
                     opacity: 0.9,
