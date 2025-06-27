@@ -48,7 +48,8 @@ import {
   GamepadIcon,
   ConfirmationNumberIcon,
   SettingsIcon,
-  AutoModeIcon
+  AutoModeIcon,
+  Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import { UserRole, PointType, ItemCategory, ItemType, RaffleStatus, TransactionType } from '@/types/enums';
 import { User } from '@/types/entities/user';
