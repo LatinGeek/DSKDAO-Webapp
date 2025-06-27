@@ -381,4 +381,55 @@ export class RaffleService {
       throw new RaffleError('Failed to get user raffle history');
     }
   }
+
+  // Get raffles by status (admin)
+  static async getRafflesByStatus(status: RaffleStatus): Promise<Raffle[]> {
+    try {
+      return await DatabaseService.getMany<Raffle>(
+        COLLECTIONS.RAFFLES,
+        [
+          DatabaseService.where('status', '==', status),
+          DatabaseService.orderBy('createdAt', 'desc')
+        ]
+      );
+    } catch (error) {
+      console.error(`Error getting raffles by status ${status}:`, error);
+      throw new RaffleError(`Failed to get raffles: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // Get all raffles (admin)
+  static async getAllRaffles(): Promise<Raffle[]> {
+    try {
+      return await DatabaseService.getMany<Raffle>(
+        COLLECTIONS.RAFFLES,
+        [DatabaseService.orderBy('createdAt', 'desc')]
+      );
+    } catch (error) {
+      console.error('Error getting all raffles:', error);
+      throw new RaffleError(`Failed to get all raffles: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
+  // Update raffle status (admin)
+  static async updateRaffleStatus(raffleId: string, status: RaffleStatus, adminUserId: string): Promise<Raffle> {
+    try {
+      const updates = {
+        status,
+        updatedBy: adminUserId
+      };
+      
+      await DatabaseService.update<Raffle>(COLLECTIONS.RAFFLES, raffleId, updates);
+      const updatedRaffle = await DatabaseService.getById<Raffle>(COLLECTIONS.RAFFLES, raffleId);
+      
+      if (!updatedRaffle) {
+        throw new RaffleError('Raffle not found after update');
+      }
+      
+      return updatedRaffle;
+    } catch (error) {
+      console.error(`Error updating raffle status ${raffleId}:`, error);
+      throw new RaffleError(`Failed to update raffle status: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }

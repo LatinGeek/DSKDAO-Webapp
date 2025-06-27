@@ -2,6 +2,7 @@ import { DatabaseService, ItemDB, COLLECTIONS } from '@/lib/db';
 import { UserService } from './userService';
 import { Item, Purchase, PurchaseRequest, ShopFilters, ShopSearchParams, LootboxContent, LootboxOpening } from '@/types/item';
 import { ItemType, ItemCategory, PurchaseStatus, TransactionType, PointType, LootboxRarity } from '@/types/enums';
+import { QueryConstraint } from 'firebase/firestore';
 
 export class ShopError extends Error {
   constructor(message: string) {
@@ -356,6 +357,83 @@ export class EnhancedShopService {
     } catch (error) {
       console.error('Error deleting item:', error);
       throw new ShopError('Failed to delete item');
+    }
+  }
+
+  // Get items with filters (for admin and enhanced search)
+  static async getItemsWithFilters(params: ShopSearchParams): Promise<{ items: Item[]; total: number; hasMore: boolean }> {
+    try {
+      const constraints: QueryConstraint[] = [];
+      
+      // Apply filters
+      if (params.filters?.active !== undefined) {
+        constraints.push(DatabaseService.where('active', '==', params.filters.active));
+      }
+      
+      if (params.filters?.category) {
+        constraints.push(DatabaseService.where('category', '==', params.filters.category));
+      }
+      
+      if (params.filters?.type) {
+        constraints.push(DatabaseService.where('type', '==', params.filters.type));
+      }
+      
+      if (params.filters?.featured !== undefined) {
+        constraints.push(DatabaseService.where('featured', '==', params.filters.featured));
+      }
+
+      if (params.filters?.inStock) {
+        constraints.push(DatabaseService.where('amount', '>', 0));
+      }
+
+      // Add ordering
+      const orderConstraints: QueryConstraint[] = [];
+      if (params.sortBy) {
+        orderConstraints.push(DatabaseService.orderBy(params.sortBy, params.sortOrder || 'asc'));
+      }
+
+      const result = await DatabaseService.getWithPagination<Item>(
+        COLLECTIONS.ITEMS,
+        constraints,
+        params.page || 1,
+        params.limit || 20,
+        orderConstraints
+      );
+
+      // Apply client-side filters that can't be done in Firestore
+      let filteredItems = result.items;
+      
+      // Price range filter
+      if (params.filters?.priceMin !== undefined || params.filters?.priceMax !== undefined) {
+        filteredItems = filteredItems.filter(item => {
+          if (params.filters!.priceMin !== undefined && item.price < params.filters!.priceMin) {
+            return false;
+          }
+          if (params.filters!.priceMax !== undefined && item.price > params.filters!.priceMax) {
+            return false;
+          }
+          return true;
+        });
+      }
+
+      // Text search
+      if (params.query) {
+        const query = params.query.toLowerCase();
+        filteredItems = filteredItems.filter(item =>
+          item.name.toLowerCase().includes(query) ||
+          item.description.toLowerCase().includes(query) ||
+          item.tags?.some(tag => tag.toLowerCase().includes(query))
+        );
+      }
+
+      return {
+        items: filteredItems,
+        total: result.total,
+        hasMore: result.hasMore
+      };
+    } catch (error) {
+      console.error('Error getting items with filters:', error);
+      throw new ShopError(`Failed to get items: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 }

@@ -271,6 +271,51 @@ export class DatabaseService {
   static increment(n: number) {
     return increment(n);
   }
+
+  // Pagination with constraints and ordering
+  static async getWithPagination<T>(
+    collectionName: string,
+    constraints: QueryConstraint[] = [],
+    page: number = 1,
+    pageSize: number = 20,
+    orderConstraints: QueryConstraint[] = []
+  ): Promise<{ items: T[]; hasMore: boolean; total: number; page: number; pageSize: number }> {
+    try {
+      const collectionRef = collection(db, collectionName);
+      
+      // Build query with constraints and ordering
+      const allConstraints = [...constraints, ...orderConstraints];
+      
+      // For pagination, we need to get more docs to determine if there are more
+      const limitConstraint = limit(pageSize + 1);
+      const paginatedQuery = query(collectionRef, ...allConstraints, limitConstraint);
+      
+      const querySnapshot = await getDocs(paginatedQuery);
+      const docs = querySnapshot.docs;
+      
+      const hasMore = docs.length > pageSize;
+      const items = docs.slice(0, pageSize).map((doc: DocumentSnapshot) => ({
+        id: doc.id,
+        ...doc.data()
+      }) as T);
+      
+      // Get total count (simplified - in production you might want to maintain a counter)
+      const totalQuery = query(collectionRef, ...constraints);
+      const totalSnapshot = await getDocs(totalQuery);
+      const total = totalSnapshot.size;
+      
+      return {
+        items,
+        hasMore,
+        total,
+        page,
+        pageSize
+      };
+    } catch (error) {
+      console.error(`Error in paginated query for ${collectionName}:`, error);
+      throw new Error(`Failed to get paginated data from ${collectionName}`);
+    }
+  }
 }
 
 // Specific collection helpers
