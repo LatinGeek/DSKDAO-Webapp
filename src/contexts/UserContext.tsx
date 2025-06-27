@@ -192,7 +192,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     setupListener();
     console.groupEnd();
-  }, [session?.user?.id, status]);
+  }, [session?.user?.id, status]); // fetchUserData is defined inside component and creates complex dependencies
 
   const refreshUserData = async () => {
     console.group('🔄 Refreshing User Data');
