@@ -148,9 +148,11 @@ npm install
 cp .env.example .env.local
 ```
 
-Configure your `.env.local`:
+📋 **Complete setup guide**: See [ENVIRONMENT_SETUP.md](./ENVIRONMENT_SETUP.md) for detailed instructions.
+
+**Quick configuration** - Add these to your `.env.local`:
 ```env
-# Firebase Configuration
+# Firebase (6 variables) - Get from Firebase Console
 NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
@@ -158,13 +160,15 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
 NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
 
-# Discord OAuth
+# Discord (4 variables) - Get from Discord Developer Portal
 DISCORD_CLIENT_ID=your-discord-client-id
 DISCORD_CLIENT_SECRET=your-discord-client-secret
+DISCORD_BOT_TOKEN=your-discord-bot-token
+DISCORD_GUILD_ID=your-discord-server-id
 
-# NextAuth
+# NextAuth (2 variables)
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-nextauth-secret
+NEXTAUTH_SECRET=your-nextauth-secret  # Generate with: openssl rand -base64 32
 ```
 
 3. **Firebase setup**
