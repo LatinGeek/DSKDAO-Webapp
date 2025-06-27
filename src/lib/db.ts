@@ -17,6 +17,7 @@ import {
   increment,
   arrayUnion,
   arrayRemove,
+  getCountFromServer,
   QueryConstraint,
   DocumentSnapshot,
   QuerySnapshot,
@@ -137,6 +138,25 @@ export class DatabaseService {
     } catch (error) {
       console.error(`Error getting documents from ${collectionName}:`, error);
       throw new Error(`Failed to get documents from ${collectionName}`);
+    }
+  }
+
+  // Count documents in a collection with optional filters
+  static async count(
+    collectionName: string,
+    filters?: QueryConstraint[]
+  ): Promise<number> {
+    try {
+      const collectionRef = collection(db, collectionName);
+      const constraints = filters || [];
+      
+      const q = query(collectionRef, ...constraints);
+      const snapshot = await getCountFromServer(q);
+      
+      return snapshot.data().count;
+    } catch (error) {
+      console.error(`Error counting documents in ${collectionName}:`, error);
+      throw new Error(`Failed to count documents in ${collectionName}`);
     }
   }
 

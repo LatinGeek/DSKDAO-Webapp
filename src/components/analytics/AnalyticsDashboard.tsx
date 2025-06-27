@@ -103,7 +103,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
 
   useEffect(() => {
     loadAnalyticsData();
-  }, [timeRange]);
+  }, [timeRange]); // loadAnalyticsData is defined inside the component, so we intentionally exclude it
 
   const loadAnalyticsData = async () => {
     setLoading(true);

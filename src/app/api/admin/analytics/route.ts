@@ -93,9 +93,9 @@ async function getSystemMetrics(startDate: Date, endDate: Date) {
 
     // Get point totals
     const users = await DatabaseService.getMany(COLLECTIONS.USERS, []);
-    const totalPointsAwarded = users.reduce((sum, user) => sum + (user.redeemablePoints || 0) + (user.soulBoundPoints || 0), 0);
-    const totalRedeemablePoints = users.reduce((sum, user) => sum + (user.redeemablePoints || 0), 0);
-    const totalSoulBoundPoints = users.reduce((sum, user) => sum + (user.soulBoundPoints || 0), 0);
+    const totalPointsAwarded = users.reduce((sum, user: any) => sum + (user.redeemablePoints || 0) + (user.soulBoundPoints || 0), 0);
+    const totalRedeemablePoints = users.reduce((sum, user: any) => sum + (user.redeemablePoints || 0), 0);
+    const totalSoulBoundPoints = users.reduce((sum, user: any) => sum + (user.soulBoundPoints || 0), 0);
 
     // Get recent transactions for revenue calculation
     const recentTransactions = await DatabaseService.getMany(
@@ -107,8 +107,8 @@ async function getSystemMetrics(startDate: Date, endDate: Date) {
     );
 
     const revenue = recentTransactions
-      .filter(t => t.type === 'SHOP_PURCHASE')
-      .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+      .filter((t: any) => t.type === 'SHOP_PURCHASE')
+      .reduce((sum: number, t: any) => sum + Math.abs(t.amount), 0);
 
     return {
       totalUsers,
@@ -135,7 +135,7 @@ async function getUserMetrics(startDate: Date, endDate: Date) {
     
     // Get user role distribution
     const allUsers = await DatabaseService.getMany(COLLECTIONS.USERS, []);
-    const roleDistribution = allUsers.reduce((acc, user) => {
+    const roleDistribution = allUsers.reduce((acc: Record<string, number>, user: any) => {
       const roles = user.roles || ['USER'];
       roles.forEach((role: string) => {
         acc[role] = (acc[role] || 0) + 1;
@@ -151,7 +151,7 @@ async function getUserMetrics(startDate: Date, endDate: Date) {
       roleDistribution,
       retentionData,
       averagePointsPerUser: Math.round(
-        allUsers.reduce((sum, user) => sum + (user.redeemablePoints || 0), 0) / allUsers.length
+        allUsers.reduce((sum: number, user: any) => sum + (user.redeemablePoints || 0), 0) / allUsers.length
       )
     };
   } catch (error) {
@@ -172,7 +172,7 @@ async function getTransactionMetrics(startDate: Date, endDate: Date) {
     );
 
     // Group by type
-    const transactionsByType = transactions.reduce((acc, transaction) => {
+    const transactionsByType = transactions.reduce((acc: Record<string, { count: number; totalAmount: number }>, transaction: any) => {
       const type = transaction.type || 'UNKNOWN';
       if (!acc[type]) {
         acc[type] = { count: 0, totalAmount: 0 };
@@ -189,7 +189,7 @@ async function getTransactionMetrics(startDate: Date, endDate: Date) {
       transactionsByType,
       dailyVolume,
       totalTransactionsInPeriod: transactions.length,
-      totalVolumeInPeriod: transactions.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0)
+      totalVolumeInPeriod: transactions.reduce((sum: number, t: any) => sum + Math.abs(t.amount || 0), 0)
     };
   } catch (error) {
     console.error('Error getting transaction metrics:', error);
@@ -211,7 +211,7 @@ async function getGameMetrics(startDate: Date, endDate: Date) {
     );
 
     // Group by game type
-    const gameStats = gameTransactions.reduce((acc, transaction) => {
+    const gameStats = gameTransactions.reduce((acc: any, transaction: any) => {
       const gameType = transaction.metadata?.gameType || 'unknown';
       if (!acc[gameType]) {
         acc[gameType] = {

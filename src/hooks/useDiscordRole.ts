@@ -49,7 +49,7 @@ export function useDiscordRole() {
       setRoles([]);
       setLoading(false);
     }
-  }, [user?.discordId, user?.discordAccessToken]);
+  }, [user?.discordId, user?.discordAccessToken, user]);
 
   const hasRole = (roleId: string) => roles.some(role => role.id === roleId);
   const getRoleName = (roleId: string) => roles.find(role => role.id === roleId)?.name;

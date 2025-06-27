@@ -225,14 +225,14 @@ export const PlinkoGame: React.FC<PlinkoGameProps> = ({
   // Initialize board on mount
   useEffect(() => {
     drawBoard();
-  }, []);
+  }, []); // drawBoard is stable and defined within component
 
   // Redraw board when component resizes
   useEffect(() => {
     const handleResize = () => drawBoard();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  }, []); // drawBoard is stable and defined within component
 
   const potentialWin = calculatePotentialWin(betAmount, 10); // Show max potential
 

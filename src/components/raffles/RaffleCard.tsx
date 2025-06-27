@@ -68,7 +68,7 @@ export const RaffleCard: React.FC<RaffleCardProps> = ({
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [raffle.endDate]);
+  }, [endDate]); // endDate is derived from raffle.endDate
 
   const handlePurchase = async () => {
     if (!userId || !canPurchase) return;
