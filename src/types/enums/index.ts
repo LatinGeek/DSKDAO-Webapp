@@ -44,7 +44,8 @@ export enum TransactionType {
   PLINKO_GAME = 'plinko_game',
   RAFFLE_ENTRY = 'raffle_entry',
   ADMIN_ADJUSTMENT = 'admin_adjustment',
-  DISCORD_REWARD = 'discord_reward'
+  DISCORD_REWARD = 'discord_reward',
+  GAME_REWARD = 'game_reward'
 }
 
 // Raffle Status Enums
