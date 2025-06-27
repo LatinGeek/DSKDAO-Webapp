@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/middleware/auth';
+import { requireAdmin, AuthenticatedRequest } from '@/middleware/auth';
 import { DatabaseService, COLLECTIONS } from '@/lib/db';
 
-export async function GET(request: NextRequest) {
+export const GET = requireAdmin(async (request: AuthenticatedRequest) => {
   try {
-    // Check admin permissions
-    const authResult = await requireAdmin(request);
-    if (!authResult.success) {
-      return NextResponse.json({ error: authResult.error }, { status: authResult.status });
-    }
 
     const { searchParams } = new URL(request.url);
     const timeRange = searchParams.get('timeRange') || '7d';
@@ -36,7 +31,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get analytics data based on requested metric
-    let analyticsData: any = {};
+    const analyticsData: any = {};
 
     if (metric === 'all' || metric === 'system') {
       analyticsData.systemMetrics = await getSystemMetrics(startDate, endDate);
@@ -76,7 +71,7 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
 
 // System Metrics
 async function getSystemMetrics(startDate: Date, endDate: Date) {

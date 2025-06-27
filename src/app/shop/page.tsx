@@ -4,7 +4,8 @@ import { Box, Container, Grid, Typography, Alert, CircularProgress } from '@mui/
 import { useItems } from '@/hooks/useItems';
 import ItemCard from '@/components/ItemCard';
 import { purchaseItem } from '@/services/purchaseService';
-import { updateUserBalance, InsufficientBalanceError, UserNotFoundError } from '@/services/userService';
+import { UserService, InsufficientBalanceError, UserNotFoundError } from '@/services/userService';
+import { PointType, TransactionType } from '@/types/enums';
 import { useState, useEffect } from 'react';
 import { Item } from '@/types/item';
 import { useAuth } from '@/hooks/useAuth';
@@ -45,7 +46,14 @@ export default function ShopPage() {
 
     try {
       // Update user balance first using Discord ID
-      await updateUserBalance(user.discordId, item.price);
+      await UserService.updateUserBalance(
+        user.discordId, 
+        PointType.REDEEMABLE, 
+        -item.price, 
+        TransactionType.PURCHASE, 
+        `Purchase: ${item.name}`,
+        { itemId: item.id, itemName: item.name }
+      );
 
       // If balance update succeeds, proceed with purchase
       await purchaseItem({

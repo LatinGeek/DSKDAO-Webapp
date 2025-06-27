@@ -386,7 +386,7 @@ export class DiscordBotService {
   private async getOrCreateUser(discordUserId: string): Promise<any | null> {
     try {
       // Try to find existing user
-      let user = await DatabaseService.getMany(
+      const user = await DatabaseService.getMany(
         COLLECTIONS.USERS,
         [DatabaseService.where('discordUserId', '==', discordUserId)]
       );
