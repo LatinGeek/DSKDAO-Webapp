@@ -4,21 +4,28 @@ import { Box, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText
 import {
   Home as HomeIcon,
   Store as StoreIcon,
-  Inventory as InventoryIcon,
+  Person as PersonIcon,
   History as HistoryIcon,
-  Settings as SettingsIcon,
+  Games as GamesIcon,
+  Casino as PlinkoIcon,
+  Stadium as ArenaIcon,
+  ConfirmationNumber as RaffleIcon,
+  EmojiEvents as LeaderboardIcon,
+  AdminPanelSettings as AdminIcon,
+  Info as AboutIcon,
   Dashboard as DashboardIcon,
-  ShoppingCart as ShoppingCartIcon,
-  Person as PersonIcon
+  ShoppingCart as ShoppingCartIcon
 } from '@mui/icons-material';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useSidebar } from '../../contexts/SidebarContext';
+import { useAuth } from '@/hooks/useAuth';
+import { UserRole } from '@/types/enums';
 import { DRAWER_WIDTH } from './constants';
 
 const menuItems = [
   { 
-    category: 'PAGES',
+    category: 'MAIN',
     items: [
       { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
       { text: 'Profile', icon: <PersonIcon />, path: '/profile' },
@@ -26,11 +33,30 @@ const menuItems = [
     ]
   },
   {
+    category: 'GAMES',
+    items: [
+      { text: 'Games Hub', icon: <GamesIcon />, path: '/games' },
+      { text: 'Plinko', icon: <PlinkoIcon />, path: '/games/plinko' },
+      { text: 'Arena', icon: <ArenaIcon />, path: '/games/arena' },
+    ]
+  },
+  {
+    category: 'COMMUNITY',
+    items: [
+      { text: 'Leaderboards', icon: <LeaderboardIcon />, path: '/leaderboards' },
+      { text: 'Raffles', icon: <RaffleIcon />, path: '/raffles' },
+    ]
+  },
+  {
     category: 'ACCOUNT',
     items: [
-      { text: 'Inventory', icon: <InventoryIcon />, path: '/inventory' },
-      { text: 'History', icon: <HistoryIcon />, path: '/history' },
-      { text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+      { text: 'Transaction History', icon: <HistoryIcon />, path: '/history' },
+    ]
+  },
+  {
+    category: 'INFO',
+    items: [
+      { text: 'About', icon: <AboutIcon />, path: '/about' },
     ]
   }
 ];
@@ -38,6 +64,24 @@ const menuItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const { isSidebarOpen, toggleSidebar, isMobile } = useSidebar();
+  const { user, isAuthenticated } = useAuth();
+
+  // Filter menu items based on user permissions
+  const getFilteredMenuItems = () => {
+    let filteredItems = [...menuItems];
+    
+    // Add admin section if user is admin
+    if (isAuthenticated && user?.roles?.includes(UserRole.ADMIN)) {
+      filteredItems.push({
+        category: 'ADMIN',
+        items: [
+          { text: 'Admin Dashboard', icon: <AdminIcon />, path: '/admin' },
+        ]
+      });
+    }
+    
+    return filteredItems;
+  };
 
   const drawerContent = (
     <>
@@ -53,7 +97,7 @@ export default function Sidebar() {
             justifyContent: 'center'
           }}
         >
-          <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>V</Typography>
+          <Typography variant="h6" sx={{ color: 'white', fontWeight: 700 }}>D</Typography>
         </Box>
         <Typography variant="h6" sx={{ fontWeight: 700 }}>
           DSKDAO
@@ -61,7 +105,7 @@ export default function Sidebar() {
       </Box>
 
       <Box sx={{ mt: 2 }}>
-        {menuItems.map((section) => (
+        {getFilteredMenuItems().map((section) => (
           <Box key={section.category} sx={{ mb: 3 }}>
             <Typography
               variant="caption"
@@ -82,7 +126,11 @@ export default function Sidebar() {
                   <ListItemButton
                     component={Link}
                     href={item.path}
-                    selected={pathname === item.path}
+                    selected={pathname === item.path || 
+                      (item.path === '/games' && pathname.startsWith('/games')) ||
+                      (item.path === '/games/plinko' && pathname === '/games/plinko') ||
+                      (item.path === '/games/arena' && pathname === '/games/arena')
+                    }
                     onClick={isMobile ? toggleSidebar : undefined}
                     sx={{
                       mx: 2,
@@ -97,7 +145,11 @@ export default function Sidebar() {
                   >
                     <ListItemIcon sx={{ 
                       minWidth: 40,
-                      color: pathname === item.path ? 'white' : 'inherit' 
+                      color: (pathname === item.path || 
+                        (item.path === '/games' && pathname.startsWith('/games')) ||
+                        (item.path === '/games/plinko' && pathname === '/games/plinko') ||
+                        (item.path === '/games/arena' && pathname === '/games/arena')
+                      ) ? 'white' : 'inherit' 
                     }}>
                       {item.icon}
                     </ListItemIcon>
@@ -105,8 +157,16 @@ export default function Sidebar() {
                       primary={item.text} 
                       sx={{
                         '& .MuiListItemText-primary': {
-                          color: pathname === item.path ? 'white' : 'inherit',
-                          fontWeight: pathname === item.path ? 600 : 400
+                          color: (pathname === item.path || 
+                            (item.path === '/games' && pathname.startsWith('/games')) ||
+                            (item.path === '/games/plinko' && pathname === '/games/plinko') ||
+                            (item.path === '/games/arena' && pathname === '/games/arena')
+                          ) ? 'white' : 'inherit',
+                          fontWeight: (pathname === item.path || 
+                            (item.path === '/games' && pathname.startsWith('/games')) ||
+                            (item.path === '/games/plinko' && pathname === '/games/plinko') ||
+                            (item.path === '/games/arena' && pathname === '/games/arena')
+                          ) ? 600 : 400
                         }
                       }}
                     />
@@ -117,6 +177,51 @@ export default function Sidebar() {
           </Box>
         ))}
       </Box>
+
+      {/* User Status Footer */}
+      {isAuthenticated && user && (
+        <Box sx={{ 
+          position: 'absolute', 
+          bottom: 0, 
+          left: 0, 
+          right: 0, 
+          p: 2, 
+          borderTop: 1, 
+          borderColor: 'divider',
+          bgcolor: 'background.paper'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                bgcolor: 'primary.main',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <Typography variant="body2" sx={{ color: 'white', fontWeight: 600 }}>
+                {user.displayName?.charAt(0).toUpperCase() || 'U'}
+              </Typography>
+            </Box>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography variant="body2" sx={{ 
+                fontWeight: 600, 
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {user.displayName || 'User'}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {user.balance || 0} tickets
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      )}
     </>
   );
 
@@ -161,6 +266,7 @@ export default function Sidebar() {
           borderColor: 'divider',
           transform: isSidebarOpen ? 'none' : 'translateX(-100%)',
           transition: 'transform 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
+          position: 'relative',
         },
       }}
     >
