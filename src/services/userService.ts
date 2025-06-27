@@ -50,7 +50,7 @@ export class UserService {
     discordRoles?: string[];
   }): Promise<User> {
     try {
-      const existingUser = await UserDB.getByDiscordId(discordUserData.discordUserId);
+      const existingUser = await UserDB.getByDiscordId(discordUserData.discordUserId) as User | null;
       
       if (existingUser) {
         // Update existing user
@@ -193,7 +193,7 @@ export class UserService {
         });
 
         // Create transaction record
-        const transactionData: CreateTransactionRequest = {
+        const transactionData: any = {
           userId,
           type: transactionType,
           pointType,
@@ -203,14 +203,12 @@ export class UserService {
           description,
           referenceId,
           referenceType: referenceId ? 'purchase' : undefined,
-          metadata
-        };
-
-        await DatabaseService.create(COLLECTIONS.TRANSACTIONS, {
-          ...transactionData,
+          metadata,
           status: 'completed',
           processedAt: new Date().toISOString()
-        });
+        };
+
+        await DatabaseService.create(COLLECTIONS.TRANSACTIONS, transactionData);
 
         return updatedUser;
       });

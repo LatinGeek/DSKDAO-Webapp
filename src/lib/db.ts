@@ -22,7 +22,8 @@ import {
   QuerySnapshot,
   WriteBatch,
   writeBatch,
-  Timestamp
+  Timestamp,
+  DocumentData
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -48,7 +49,7 @@ export const COLLECTIONS = {
 export class DatabaseService {
   
   // Create a new document
-  static async create<T extends Record<string, any>>(
+  static async create<T extends DocumentData>(
     collectionName: string,
     data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>
   ): Promise<T> {
@@ -61,7 +62,7 @@ export class DatabaseService {
         id: docRef.id,
         createdAt: timestamp,
         updatedAt: timestamp
-      } as T;
+      } as unknown as T;
 
       await setDoc(docRef, documentData);
       return documentData;
@@ -72,7 +73,7 @@ export class DatabaseService {
   }
 
   // Create with custom ID
-  static async createWithId<T extends Record<string, any>>(
+  static async createWithId<T extends DocumentData>(
     collectionName: string,
     id: string,
     data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>
@@ -86,7 +87,7 @@ export class DatabaseService {
         id,
         createdAt: timestamp,
         updatedAt: timestamp
-      } as T;
+      } as unknown as T;
 
       await setDoc(docRef, documentData);
       return documentData;
@@ -129,7 +130,7 @@ export class DatabaseService {
       const q = query(collectionRef, ...constraints);
       const querySnapshot = await getDocs(q);
       
-      return querySnapshot.docs.map(doc => ({
+      return querySnapshot.docs.map((doc: DocumentSnapshot) => ({
         id: doc.id,
         ...doc.data()
       }) as T);
@@ -223,7 +224,7 @@ export class DatabaseService {
       const docs = querySnapshot.docs;
 
       const hasMore = docs.length > pageSize;
-      const items = docs.slice(0, pageSize).map(doc => ({
+      const items = docs.slice(0, pageSize).map((doc: DocumentSnapshot) => ({
         id: doc.id,
         ...doc.data()
       }) as T);
@@ -274,7 +275,7 @@ export class DatabaseService {
 
 // Specific collection helpers
 export class UserDB {
-  static async getByDiscordId(discordUserId: string) {
+  static async getByDiscordId(discordUserId: string): Promise<any | null> {
     const users = await DatabaseService.getMany(
       COLLECTIONS.USERS,
       [DatabaseService.where('discordUserId', '==', discordUserId)]
