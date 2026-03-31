@@ -110,16 +110,17 @@ export default function Header() {
               }}
             />
 
-            <IconButton color="inherit">
+            <IconButton color="inherit" aria-label="notifications">
               <NotificationsIcon />
             </IconButton>
-            
-            <IconButton color="inherit">
+
+            <IconButton color="inherit" aria-label="settings">
               <SettingsIcon />
             </IconButton>
 
             <IconButton
               onClick={handleMenuOpen}
+              aria-label="user menu"
               sx={{
                 ml: 1,
                 '&:hover': {

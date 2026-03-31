@@ -123,6 +123,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
             <IconButton
               edge="start"
               color="inherit"
+              aria-label="open navigation menu"
               onClick={() => setSideMenuOpen(true)}
               className="text-white"
             >
@@ -137,7 +138,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
             {/* User Section */}
             <div className="flex items-center space-x-2">
               {/* Notifications */}
-              <IconButton color="inherit">
+              <IconButton color="inherit" aria-label="notifications">
                 <Badge badgeContent={3} color="error">
                   <Notifications className="text-white" />
                 </Badge>
@@ -145,7 +146,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
               {/* User Avatar */}
               {user ? (
-                <IconButton onClick={handleUserMenuOpen} className="p-1">
+                <IconButton onClick={handleUserMenuOpen} aria-label="user menu" className="p-1">
                   <Avatar
                     src={user.avatar}
                     className="w-8 h-8"
@@ -155,7 +156,7 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({
                   </Avatar>
                 </IconButton>
               ) : (
-                <IconButton onClick={() => router.push('/auth/signin')} color="inherit">
+                <IconButton onClick={() => router.push('/auth/signin')} aria-label="sign in" color="inherit">
                   <Person className="text-white" />
                 </IconButton>
               )}
